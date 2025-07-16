@@ -201,4 +201,5 @@ function BarcodePrinting() {
   )
 }
 
+
 export default BarcodePrinting
