@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, PieChart, Pie, BarChart, Bar, Tooltip, Legend, CartesianGrid, XAxis, YAxis, Cell, ResponsiveContainer } from "recharts";
-import { FaChartLine, FaBox, FaDollarSign, FaStar } from "react-icons/fa";
+// import { FaChartLine, FaBox, FaDollarSign, FaStar } from "react-icons/fa";
 import config from "../../../features/config";
 import Loader from "../../../pages/Loader";
 import functions from "../../../features/functions";
@@ -70,7 +70,7 @@ const Dashboard = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-blue-100 rounded-full">
-                <FaChartLine className="text-blue-500 text-2xl" />
+                {/* <FaChartLine className="text-blue-500 text-2xl" /> */}
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-gray-600">Total Sales</h2>
@@ -83,7 +83,7 @@ const Dashboard = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-green-100 rounded-full">
-                <FaDollarSign className="text-green-500 text-2xl" />
+                {/* <FaDollarSign className="text-green-500 text-2xl" /> */}
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-gray-600">Total Revenue</h2>
@@ -96,7 +96,7 @@ const Dashboard = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-yellow-100 rounded-full">
-                <FaChartLine className="text-yellow-500 text-2xl" />
+                {/* <FaChartLine className="text-yellow-500 text-2xl" /> */}
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-gray-600">Avg Sales / Month</h2>
@@ -109,7 +109,7 @@ const Dashboard = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-purple-100 rounded-full">
-                <FaStar className="text-purple-500 text-2xl" />
+                {/* <FaStar className="text-purple-500 text-2xl" /> */}
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-gray-600">Top Product</h2>
