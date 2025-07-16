@@ -192,3 +192,13 @@
 // };
 
 // export default BarcodePrinting;
+
+import React from 'react'
+
+function BarcodePrinting() {
+  return (
+    <div>BarcodePrinting</div>
+  )
+}
+
+export default BarcodePrinting
