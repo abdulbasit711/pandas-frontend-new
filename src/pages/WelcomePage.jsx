@@ -156,19 +156,19 @@ function WelcomePage() {
 
     }
 
-    const fetchUserData = async () => {
-        const response = await authService.getCurrentUser()
-        if (response) {
-            console.log("welcome page userdata: ", response.data);
-            dispatch(setPrimayPath((response.data?.BusinessId ? response.data.BusinessId.businessName : response.data?.username)?.replace(/ /g, '-')))
-            dispatch(setCurrentUser(response.data))
-        }
+    // const fetchUserData = async () => {
+    //     const response = await authService.getCurrentUser()
+    //     if (response) {
+    //         console.log("welcome page userdata: ", response.data);
+    //         dispatch(setPrimayPath((response.data?.BusinessId ? response.data.BusinessId.businessName : response.data?.username)?.replace(/ /g, '-')))
+    //         dispatch(setCurrentUser(response.data))
+    //     }
 
 
-    }
+    // }
 
     useEffect(() => {
-        fetchUserData();
+        // fetchUserData();
         setSuccessMessage('')
         fetchAllProducts();
         fetchAllCustomers();
