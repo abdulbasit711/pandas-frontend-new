@@ -82,6 +82,7 @@ const StockRegistrationForm = () => {
         if (products && products.data)
           dispatch(setAllProducts(products.data))
         setSuccessMessage(true)
+        setValue('productName', '');
       }
 
       // }
