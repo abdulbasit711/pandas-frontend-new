@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import config from '../../../features/config';
 import { setBillData, setBill, setBillNo, setSearchBillFilters } from '../../../store/slices/bills/billSlice';
@@ -37,12 +37,19 @@ function SoldItems() {
 
   const dispatch = useDispatch();
   const customerData = useSelector((state) => state.customers.customerData)
-  const { 
+  const {
     billData,
     billNo,
     searchBillFilters
   } = useSelector((state) => state.bills);
   const navigate = useNavigate();
+
+
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     fetchAllBills();
@@ -91,20 +98,20 @@ function SoldItems() {
   };
 
   const handleDateChange = (e) => {
-        const { name, value } = e.target;
-        dispatch(setSearchBillFilters({ ...searchBillFilters, [name]: value }));
-        setValidationMessage("");
-    };
+    const { name, value } = e.target;
+    dispatch(setSearchBillFilters({ ...searchBillFilters, [name]: value }));
+    setValidationMessage("");
+  };
 
   const handleCheckboxChange = (e) => {
-        const { name, value, checked } = e.target;
-        const currentValues = searchBillFilters[name];
-        const newValues = checked
-            ? [...currentValues, value]
-            : currentValues.filter((item) => item !== value);
+    const { name, value, checked } = e.target;
+    const currentValues = searchBillFilters[name];
+    const newValues = checked
+      ? [...currentValues, value]
+      : currentValues.filter((item) => item !== value);
 
-        dispatch(setSearchBillFilters({ ...searchBillFilters, [name]: newValues }));
-    };
+    dispatch(setSearchBillFilters({ ...searchBillFilters, [name]: newValues }));
+  };
 
   const handleRetrieve = () => {
     if (searchBillFilters.startDate && searchBillFilters.endDate && new Date(searchBillFilters.endDate) < new Date(searchBillFilters.startDate)) {
@@ -135,10 +142,10 @@ function SoldItems() {
   }
 
   useEffect(() => {
-      if (billNo && billNo.length >= 5) {
-        fetchBill(billNo);
-      }
-    }, [billNo]);
+    if (billNo && billNo.length >= 5) {
+      fetchBill(billNo);
+    }
+  }, [billNo]);
 
   const fetchBill = async (billNo) => {
     try {
@@ -252,6 +259,7 @@ function SoldItems() {
             className="w-72 text-xs p-1"
             value={billNo && billNo || ''}
             // disabled={bill}
+            ref={inputRef}
             onChange={(e) => dispatch(setBillNo(e.target.value))}
           />
         </div>
