@@ -8,7 +8,7 @@ import Barcode from 'react-barcode';
 // ViewBill component wrapped in forwardRef
 const ViewBillThermal = React.forwardRef((props, ref) => {
     const bill = props.bill;
-    const exemptedParagraph = bill.BusinessId?.exemptedParagraph?.split('۔')
+    const exemptedParagraph = bill.BusinessId?.exemptedParagraph
     const packingSlip = props.packingSlip
     const previousBalance = props.previousBalance
     const showPreviousBalance = props.showPreviousBalance
@@ -122,26 +122,25 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                 </div> */}
 
                 {/* Footer Section */}
-                {props.exemptedParagraph == true &&
+                {exemptedParagraph &&
                     <div className="text-center mt-1 text-[8px] pb-5">
-                        {props.exemptedParagraph}
+                        {exemptedParagraph}
                     </div>
                 }
 
                 {bill?._id && (
-                    <div className='mt-2 flex justify-center'>
-                        <Barcode
-                            value={bill._id}
-                            width={1}
-                            height={30}
-                            fontSize={8}
-                            displayValue={false}
-                            margin={0}
-                        />
+                    <div className="w-full flex justify-center my-2">
+                        <div className="w-2/3 flex justify-center">
+                            <Barcode
+                                value={bill._id}
+                                height={40}
+                                displayValue={false}
+                                width={1}
+                                background="#ffffff"
+                            />
+                        </div>
                     </div>
                 )}
-
-
 
                 <div className='flex justify-center mt-3'>
                     <Logo width='w-10 h-10' className='rounded-full opacity-90 hue-rotate-180' />
