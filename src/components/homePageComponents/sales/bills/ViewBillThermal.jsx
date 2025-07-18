@@ -2,6 +2,8 @@
 import React from 'react';
 import Logo from '../../../Logo';
 import commonFunction from '../../../../features/functions';
+import Barcode from 'react-barcode';
+
 
 // ViewBill component wrapped in forwardRef
 const ViewBillThermal = React.forwardRef((props, ref) => {
@@ -12,7 +14,7 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
     const showPreviousBalance = props.showPreviousBalance
     // console.log(exemptedParagraph)
 
-    
+
 
     return bill && (
         <div className="thermal-bill mt-5 w-[80mm] min-h-[24rem] max-h-72 shadow-lg overflow-y-auto scrollbar-thin mx-auto">
@@ -86,14 +88,14 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
 
                 {/* Totals Section */}
                 {!packingSlip && <div className='flex justify-end'>
-                    <div className={` text-xs mt-2 ${showPreviousBalance ? 'w-7/12' : 'w-36' } border flex flex-col gap-[2px] p-2 border-gray-600`}>
+                    <div className={` text-xs mt-2 ${showPreviousBalance ? 'w-7/12' : 'w-36'} border flex flex-col gap-[2px] p-2 border-gray-600`}>
                         <p><span className={`font-semibold ${showPreviousBalance ? 'w-20' : 'w-16'} inline-block`}>Total:</span> {commonFunction.formatAsianNumber(bill.totalAmount)}</p>
                         <p className='font-bold'><span className={`font-semibold ${showPreviousBalance ? 'w-20' : 'w-16'} inline-block`}>Discount:</span> {commonFunction.formatAsianNumber(bill.flatDiscount)}</p>
                         <p><span className={`font-semibold ${showPreviousBalance ? 'w-20' : 'w-16'} inline-block`}>Paid:</span> {commonFunction.formatAsianNumber(bill.paidAmount)}</p>
                         <p><span className={`font-semibold ${showPreviousBalance ? 'w-20' : 'w-16'} inline-block`}>Balance:</span> {commonFunction.formatAsianNumber(bill.totalAmount - bill.flatDiscount - bill.paidAmount)}</p>
                         {showPreviousBalance &&
                             <p className='font-semibold'>
-                                <span className={` ${showPreviousBalance ? 'w-20' : 'w-16'} inline-block`}>Previous Bal. :</span> 
+                                <span className={` ${showPreviousBalance ? 'w-20' : 'w-16'} inline-block`}>Previous Bal. :</span>
                                 <span className='underline'>{previousBalance && commonFunction.formatAsianNumber((previousBalance) - (bill.totalAmount - bill.flatDiscount - bill.paidAmount))}</span>
                             </p>
                         }
@@ -105,7 +107,7 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                     </div>
                 </div>}
 
-                <div className='mt-3'>
+                {/* <div className='mt-3'>
                     <ul className='text-[8px] text-right'>
                         <li className='flex flex-row-reverse gap-1 pt-1'>
                             <span>&#8592;</span> کوئی بھی آئیٹم واپس یا تبدیل ہو سکتا ہے بشرطیکہ وہ اپنی اصلی حالت میں ہو اور مکمل پیکنگ میں ہو
@@ -117,20 +119,30 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                             <span>&#8592;</span> چائنہ آئیٹمز کی واپسی نہیں ہوگی
                         </li>
                     </ul>
-                </div>
+                </div> */}
 
                 {/* Footer Section */}
                 {props.exemptedParagraph == true &&
-                    <div className="text-justify mt-1 text-[8px] pb-5">
-                        <h4 className='text-center text-[10px] py-2 font-bold'>:ضروری ہدایات</h4>
-                        <ul>
-                            {exemptedParagraph?.map((paragraph, i) => (
-                                paragraph.length > 3 &&
-                                <li key={i} className='text-right flex flex-row-reverse gap-1 pt-1'> <span>&#8592;</span> <span>{paragraph}</span></li>
-                            ))}
-                        </ul>
+                    <div className="text-center mt-1 text-[8px] pb-5">
+                        {props.exemptedParagraph}
                     </div>
                 }
+
+                {bill?._id && (
+                    <div className='mt-2 flex justify-center'>
+                        <Barcode
+                            value={bill._id}
+                            width={1}
+                            height={30}
+                            fontSize={8}
+                            displayValue={false}
+                            margin={0}
+                        />
+                    </div>
+                )}
+
+
+
                 <div className='flex justify-center mt-3'>
                     <Logo width='w-10 h-10' className='rounded-full opacity-90 hue-rotate-180' />
 
