@@ -370,7 +370,7 @@ const StockRegistrationForm = () => {
           <div className='w-full flex justify-center'>
             <button
               type="submit"
-              className=" bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700 text-xs"
+              className=" bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/60 text-xs"
             >
               Register Item
             </button>
