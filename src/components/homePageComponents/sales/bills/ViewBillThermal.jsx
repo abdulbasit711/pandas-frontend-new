@@ -128,11 +128,11 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                     </div>
                 }
 
-                {bill?._id && (
+                {bill?.billNo && (
                     <div className="w-full flex justify-center my-1">
                         <div className="w-2/3 flex justify-center">
                             <Barcode
-                                value={bill._id}
+                                value={bill.billNo}
                                 height={50}
                                 displayValue={false}
                                 width={1}
