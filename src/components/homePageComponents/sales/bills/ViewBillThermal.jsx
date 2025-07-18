@@ -45,7 +45,7 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                             hour12: true,
                         })
                     }</p>
-                    <p><span className='font-semibold pr-1'>Customer:</span> {bill.customer?.customerName}</p>
+                    <p><span className='font-semibold pr-1'>Customer:</span> {bill.customer?.customerName || 'Walk-in'}</p>
                 </div>
 
                 {/* Items Section */}
