@@ -123,13 +123,13 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
 
                 {/* Footer Section */}
                 {exemptedParagraph &&
-                    <div className="text-center mt-1 text-xs font-semibold ">
+                    <div className="text-center mt-2 text-xs font-semibold ">
                         {exemptedParagraph}
                     </div>
                 }
 
                 {bill?._id && (
-                    <div className="w-full flex justify-center my-2">
+                    <div className="w-full flex justify-center my-1">
                         <div className="w-2/3 flex justify-center">
                             <Barcode
                                 value={bill._id}
