@@ -62,7 +62,7 @@ const Dashboard = () => {
   return loading ?
     <Loader message="Loading Dashboard Data Please Wait...." mt="" h_w="h-10 w-10 border-t-2 border-b-2" />
     : (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 overflow-y-auto max-h-screen">
 
         {/* KPI Cards - Modern Design */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
