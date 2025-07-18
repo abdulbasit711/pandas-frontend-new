@@ -48,8 +48,12 @@ function SoldItems() {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 200); // small delay helps after render
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   useEffect(() => {
     fetchAllBills();
