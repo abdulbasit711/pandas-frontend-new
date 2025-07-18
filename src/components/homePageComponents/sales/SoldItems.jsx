@@ -236,7 +236,7 @@ function SoldItems() {
           </div>
           <div className='flex items-center justify-center'>
             <button
-              className="bg-gray-600 hover:bg-gray-800 duration-200 text-white p-2 rounded"
+              className="bg-primary hover:bg-primary/70 duration-200 text-white p-2 rounded"
               onClick={handleRetrieve}
             >
               Retrieve
@@ -303,7 +303,7 @@ function SoldItems() {
                     <td className="py-1 px-2">
                       {bill.isPosted ? <span className='p-2'>Bill Posted</span> : (!(bill.billStatus === "paid") ? (
                         <button
-                          className="bg-gray-600 hover:bg-gray-800 duration-200 text-white p-2 rounded"
+                          className="bg-primary hover:bg-primary/60 duration-200 text-white p-2 rounded"
                           onClick={() => handleBillPayment(bill.billNo)}
                         >
                           Add Payment
@@ -313,7 +313,7 @@ function SoldItems() {
                     {/* button to edit bill */}
                     <td>
                       {bill.isPosted ? <span className=''> Posted</span> : <button
-                        className="bg-gray-600 hover:bg-gray-800 duration-200 text-white p-2 rounded"
+                        className="bg-primary hover:bg-primary/60 duration-200 text-white p-2 rounded"
                         onClick={() => {
                           setBillId(bill.billNo)
                           setIsEditing(true)

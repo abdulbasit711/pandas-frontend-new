@@ -170,7 +170,7 @@ function PurchaseReport() {
 
           <div className='flex items-center justify-center'>
             <button
-              className="bg-gray-600 hover:bg-gray-800 duration-200 text-white p-2 rounded"
+              className="bg-primary hover:bg-primary/60 duration-200 text-white p-2 rounded"
               onClick={handleRetrieve}
             >
               Retrieve
