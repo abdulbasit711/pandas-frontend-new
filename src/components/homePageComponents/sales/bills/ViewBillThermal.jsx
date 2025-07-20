@@ -123,13 +123,13 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
 
                 {/* Footer Section */}
                 {exemptedParagraph &&
-                    <div className="text-center mt-2 text-xs font-semibold ">
+                    <div className="text-center mt-3 text-xs font-semibold ">
                         {exemptedParagraph}
                     </div>
                 }
 
                 {bill?.billNo && (
-                    <div className="w-full flex justify-center my-1">
+                    <div className="w-full flex justify-center mt-1">
                         <div className="w-2/3 flex justify-center">
                             <Barcode
                                 value={bill.billNo}
@@ -142,7 +142,7 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                     </div>
                 )}
 
-                <div className='flex justify-center mt-3'>
+                <div className='flex justify-center mt-2'>
                     <Logo width='w-10 h-10' className='rounded-full opacity-90 hue-rotate-180' />
 
                 </div>
