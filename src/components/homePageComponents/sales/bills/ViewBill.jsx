@@ -137,25 +137,18 @@ const ViewBill = React.forwardRef((props, ref) => {
                     </div>
                 }
 
-                {!packingSlip &&
+                {/* {!packingSlip &&
                     <div className='mt-3'>
                         <p className='text-[12px] text-right'>نوٹ:  کوئی بھی آئیٹم واپس یا تبدیل ہو سکتا ہے بشرطیکہ وہ اپنی اصلی حالت میں ہو اور مکمل پیکنگ میں ہو۔ چائنہ آئیٹمز کی واپسی نہیں ہوگی۔ کسی بھی آئٹم کی واپسی صرف بل یا رسید کی موجودگی میں ہی قابل قبول ہوگی۔ </p>
 
                     </div>
-                }
+                } */}
 
                 {/* Signature Section */}
                 <div className=''>
-                    {
-                        props.exemptedParagraph &&
-                        <div className="text-justify mt-4 text-[10px] pb-5">
-                            <h4 className='text-right mr-4 text-[12px] py-2 font-bold'>:ضروری ہدایات</h4>
-                            <ul>
-                                {exemptedParagraph?.map((paragraph, i) => (
-                                    paragraph.length > 3 &&
-                                    <li key={i} className='text-right flex flex-row-reverse gap-1 py-1'> <span>&#8592;</span> <span>{paragraph}</span></li>
-                                ))}
-                            </ul>
+                    {exemptedParagraph &&
+                        <div className="text-center mt-3 text-xs font-semibold ">
+                            {exemptedParagraph}
                         </div>
                     }
                     <div className='flex items-end justify-end gap-20'>
