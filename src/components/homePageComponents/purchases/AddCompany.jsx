@@ -49,6 +49,8 @@ const AddCompany = () => {
             }
         } catch (error) {
             console.log("error adding company:", error)
+        } finally {
+            setIsLoading(false)
         }
     };
 
