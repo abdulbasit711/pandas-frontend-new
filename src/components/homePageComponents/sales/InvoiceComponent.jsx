@@ -366,7 +366,7 @@ const InvoiceComponent = () => {
         setIsInvoiceGenerated(true);
 
       } catch (error) {
-        console.log('error', error)
+        console.log('error', error.response?.data?.message)
         const htmlString = error.response?.data;
 
         // Parse the HTML string into a DOM object
@@ -378,7 +378,7 @@ const InvoiceComponent = () => {
         // Extract only the first line (the error message)
         const errorMessage = preContent.split('\n')[0]; // Get the first line
 
-        setBillError(error.response?.data?.message)
+        setBillError(error.response?.data?.message || "Failed to generate invoice")
       } finally {
         setIsLoading(false)
 
