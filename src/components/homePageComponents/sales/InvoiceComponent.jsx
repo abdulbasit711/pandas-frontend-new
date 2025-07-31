@@ -378,7 +378,7 @@ const InvoiceComponent = () => {
         // Extract only the first line (the error message)
         const errorMessage = preContent.split('\n')[0]; // Get the first line
 
-        setBillError(error.message)
+        setBillError(error.response.data.message)
       } finally {
         setIsLoading(false)
 
