@@ -4,8 +4,8 @@ import axios from 'axios';
 export class AuthService {
     constructor() {
         this.client = axios.create({
-            // baseURL: conf.appwriteUrl,
-            baseURL: "https://pandas-server.onrender.com/api/v1",
+            baseURL: conf.appwriteUrl,
+            // baseURL: "https://pandas-server.onrender.com/api/v1",
             withCredentials: true
         });
 

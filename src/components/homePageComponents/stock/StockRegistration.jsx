@@ -84,6 +84,16 @@ const StockRegistrationForm = () => {
         setSuccessMessage(true)
         setValue('productName', '');
         setValue('productTotalQuantity', '');
+        setValue('categoryId', '');
+        setValue('typeId', '');
+        setValue('companyId', '');
+        setValue('salePrice1', '');
+        setValue('salePrice2', '');
+        setValue('salePrice3', '');
+        setValue('salePrice4', '');
+        setValue('vendorSupplierId', '');
+        setValue('vendorCompanyId', '');
+        setValue('productPurchasePrice', '');
       }
 
       // }

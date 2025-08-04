@@ -238,6 +238,26 @@ export class Config {
         }
     }
 
+    async deleteProduct(id) {
+        try {
+            const response = await this.client.delete(`/product/${id}`,
+                {
+                    headers: {
+                        Authorization: ` Bearer ${authService.getAccessToken()}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+            if (response.data) {
+                console.log(response.data)
+                return response.data;
+            }
+        } catch (error) {
+            console.error("Error in deleting product:", error);
+            throw error;
+        }
+    }
+
 
     async registerStock({ ...props }) {
         try {

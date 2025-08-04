@@ -9,6 +9,7 @@ import Input from '../../Input';
 import {
     setAllProducts
 } from '../../../store/slices/products/productsSlice'
+import ButtonLoader from '../../ButtonLoader'
 
 const StockSearch = () => {
 
@@ -23,6 +24,7 @@ const StockSearch = () => {
     const [productName, setProductName] = useState('')
     const [searchQuery, setSearchQuery] = useState('')
     const [searchQueryProducts, setSearchQueryProducts] = useState('')
+    const [deleteId, setDeleteId] = useState('')
 
 
     const {
@@ -111,6 +113,31 @@ const StockSearch = () => {
             setIsButtonLoading(false)
         }
     };
+
+    const handleDelete = async (id) => {
+        setIsButtonLoading(true)
+        setDeleteId(id)
+
+        try {
+            const response = await config.deleteProduct(id);
+            if (response) {
+                setSuccessMessage(response.message)
+                console.log("comp res: ", response.message)
+                const allProductsBefore = await config.fetchAllProducts()
+                if (allProductsBefore.data) {
+                    dispatch(setAllProducts(allProductsBefore.data));
+                }
+            }
+            setSearchQuery('')
+        } catch (error) {
+            console.log("error deleting Product:", error)
+        } finally {
+            setIsLoading(false)
+            setIsStockUpdated(true)
+            setDeleteId('')
+            setIsButtonLoading(false)
+        }
+    }
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -201,7 +228,7 @@ const StockSearch = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {searchQueryProducts && searchQueryProducts.map((product, index) => (
+                            {searchQuery && searchQueryProducts?.map((product, index) => (
                                 <tr key={index} className="border-t cursor-pointer hover:bg-gray-300" >
                                     <td className="px-1 py-1">{product.productCode}</td>
                                     <td className="px-1 py-1">{product.productName}</td>
@@ -212,7 +239,15 @@ const StockSearch = () => {
                                     <td className="px-1 py-1">{product.categoryDetails[0]?.productName}</td>
                                     <td className="px-1 py-1">{product.salePriceDetails[0]?.salePrice1}</td>
                                     <td className="px-1 py-1">{Math.ceil(product.productTotalQuantity / product.productPack)}</td>
-                                    <td className="py-1 px-2">
+                                    <td className="py-1 px-2 flex gap-2">
+                                        <button
+                                            className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded-full"
+                                            onClick={() => handleDelete(product._id)}
+                                        >
+                                            {(isButtonLoading && product._id === deleteId )? 
+                                        <ButtonLoader /> : 'Delete'    
+                                        }
+                                        </button>
                                         <button
                                             className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded-full"
                                             onClick={() => handleEdit(product._id, product.productName, product)}
