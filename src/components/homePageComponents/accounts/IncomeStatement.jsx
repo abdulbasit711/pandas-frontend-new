@@ -113,7 +113,7 @@ const IncomeStatement = () => {
           </div>
 
           <div className="mt-4 font-bold text-lg text-right">
-            <span className={`${(totalRevenue-totalExpenses) > 0 ? 'text-green-600' : 'text-red-500'}`}>Net Income: {totalRevenue - totalExpenses}</span>
+            <span className={`${(totalRevenue-totalExpenses) > 0 ? 'text-green-600' : 'text-red-500'}`}>Net Income: {(totalRevenue - totalExpenses)?.toFixed(2)}</span>
           </div>
         </div>
       </div>

@@ -160,7 +160,8 @@ const AccountReceivables = () => {
             {paginatedReceivables.filter((receivable) =>
               receivable.bill?.billStatus !== 'paid' && !receivable.bill?.isPosted).map((receivable, index) => (
 
-                <React.Fragment key={receivable.bill.billNo}>
+                // <React.Fragment key={receivable.bill.billNo}>
+                //   </React.Fragment>
                   <tr key={index} className={`border-t hover:cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
                     <td className="py-2 px-2 text-center">{index + 1}</td>
                     <td className="py-2 px-2 text-center">
@@ -202,7 +203,6 @@ const AccountReceivables = () => {
                       >Post</button>
                     </td>
                   </tr>
-                </React.Fragment>
               ))}
           </tbody>
         </table>

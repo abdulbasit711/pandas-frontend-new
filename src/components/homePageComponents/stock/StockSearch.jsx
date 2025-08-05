@@ -50,7 +50,7 @@ const StockSearch = () => {
         setIsEdit(true)
         setProductName(name)
         setProduct(product)
-        // console.log(id)
+        console.log(product)
 
         setValue('productId', id);
         setValue('productCode', product.productCode || '');
@@ -65,6 +65,8 @@ const StockSearch = () => {
         setValue('companyId', product.companyDetails?.[0]?._id || '');
         setValue('productDiscountPercentage', product.productDiscountPercentage || '');
         setValue('productPack', product.productPack || '');
+        setValue('quantityUnit', product.quantityUnit || '');
+        setValue('packUnit', product.packUnit || '');
         setValue('productUnit', product.productUnit || '');
         setValue('productPurchasePrice', product.productPurchasePrice || '');
         setValue('productTotalQuantity', product.productTotalQuantity / product.productPack || '');
@@ -97,13 +99,17 @@ const StockSearch = () => {
             const response = await config.updateProduct(cleanedData);
             if (response) {
                 setSuccessMessage(response.message)
-                console.log("comp res: ", response.message)
+                // console.log("comp res: ", response.message)
+                setIsLoading(false)
+                setIsStockUpdated(true)
+                setIsButtonLoading(false)
+                setIsEdit(false)
+                reset()
+
                 const allProductsBefore = await config.fetchAllProducts()
                 if (allProductsBefore.data) {
                     dispatch(setAllProducts(allProductsBefore.data));
                 }
-                setIsEdit(false)
-                reset()
             }
         } catch (error) {
             console.log("error updating Product:", error)
@@ -122,13 +128,18 @@ const StockSearch = () => {
             const response = await config.deleteProduct(id);
             if (response) {
                 setSuccessMessage(response.message)
-                console.log("comp res: ", response.message)
+                // console.log("comp res: ", response.message)
+                setIsButtonLoading(false)
+                setSearchQuery('')
+                setDeleteId('')
+                setIsLoading(false)
+                setIsStockUpdated(true)
+
                 const allProductsBefore = await config.fetchAllProducts()
                 if (allProductsBefore.data) {
                     dispatch(setAllProducts(allProductsBefore.data));
                 }
             }
-            setSearchQuery('')
         } catch (error) {
             console.log("error deleting Product:", error)
         } finally {
@@ -244,9 +255,9 @@ const StockSearch = () => {
                                             className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded-full"
                                             onClick={() => handleDelete(product._id)}
                                         >
-                                            {(isButtonLoading && product._id === deleteId )? 
-                                        <ButtonLoader /> : 'Delete'    
-                                        }
+                                            {(isButtonLoading && product._id === deleteId) ?
+                                                <ButtonLoader /> : 'Delete'
+                                            }
                                         </button>
                                         <button
                                             className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded-full"
@@ -418,7 +429,7 @@ const StockSearch = () => {
 
                                 {/* Pack */}
 
-                                <div className="mb-2 grid grid-cols-2 gap-2">
+                                <div className="mb-2 grid grid-cols-2 gap-2 items-center">
                                     <div className="mb-2">
                                         <label className="block text-gray-700 text-xs">Pack:</label>
                                         <input
@@ -427,13 +438,13 @@ const StockSearch = () => {
                                             className="w-full px-2 py-1 border rounded-md text-xs"
                                         />
                                     </div>
-                                    <div className="mb-2">
-                                        <label className="block text-gray-700 text-xs">Unit:</label>
-                                        <input
-                                            type="text"
-                                            {...register('productUnit')}
-                                            className="w-full px-2 py-1 border rounded-md text-xs"
-                                        />
+                                    <div className=''>
+                                        <select name="" id="" className='px-2 py-1 text-xs'
+                                            {...register('packUnit')}>
+                                            {['pcs', 'kg', 'grams', 'ft', 'inches', 'cm'].map((unit, i) => (
+                                                <option key={i} value={unit}>{unit.toUpperCase()}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
 
@@ -448,23 +459,35 @@ const StockSearch = () => {
                                 </div>
 
                                 {/* Total Quantity */}
-                                <div className="mb-2">
-                                    <label className="block text-gray-700 text-xs">Total Quantity</label>
-                                    <input
-                                        type="text"
-                                        {...register('productTotalQuantity')}
-                                        className="w-full px-2 py-1 border rounded-md text-xs"
-                                    />
+                                <div className='mb-2 grid grid-cols-2 gap-2 items-center'>
+                                    <div className="mb-2">
+                                        <label className="block text-gray-700 text-xs">Total Quantity</label>
+                                        <input
+                                            type="text"
+                                            {...register('productTotalQuantity')}
+                                            className="w-full px-2 py-1 border rounded-md text-xs"
+                                        />
+                                    </div>
+                                    <div className=''>
+                                        <select name="" id="" className='px-2 py-1 text-xs'
+                                            {...register('quantityUnit')}>
+                                            {['pcs', 'pack', 'kg', 'ton', 'meter', 'yard', 'ft'].map((unit, i) => (
+                                                <option key={i} value={unit}>{unit.toUpperCase()}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
 
                         <div className='w-full flex justify-center'>
                             <button
                                 type="submit"
-                                className=" bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700 text-xs"
+                                className=" bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/80 text-xs"
                             >
-                                Update Details
+                                {isButtonLoading ? 
+                                <ButtonLoader /> : 'Update Details'}
                             </button>
                         </div>
                     </form>

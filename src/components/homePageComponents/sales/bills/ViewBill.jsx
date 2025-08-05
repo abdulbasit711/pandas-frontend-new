@@ -88,18 +88,31 @@ const ViewBill = React.forwardRef((props, ref) => {
                                     <td className="text-xs p-2">{index + 1}</td>
                                     <td className="text-xs p-2">{commonFunction.truncateString(item.productId.productName, 30)}</td>
                                     <td className="text-xs p-2">{commonFunction.truncateString(item.productId?.companyId?.companyName, 13)}</td>
-                                    <td className="text-xs p-2">{item.quantity}</td>
+                                    <td className="text-xs p-2">
+                                        <div>
+                                            {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? (item.billItemUnit) : (item.quantity + item.billItemUnit / item.billItemPack)}
+                                            <span> {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? (item.productId.packUnit)?.toUpperCase() || 'PCS' : (item.productId.quantityUnit)?.toUpperCase() || 'PCS'}</span>
+                                        </div>
+                                    </td>
                                     {!packingSlip &&
-                                        <td className="text-xs p-2">{commonFunction.formatAsianNumber(item.billItemPrice)}</td>
+                                        <td className="text-xs p-2">
+                                            {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? commonFunction.formatAsianNumber(((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) -
+                                                (((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) * item.billItemDiscount / 100)) : commonFunction.formatAsianNumber(item.billItemPrice)}
+                                        </td>
                                     }
                                     {!packingSlip &&
-                                        <td className="text-xs p-2">{commonFunction.formatAsianNumber(item.quantity * item.billItemPrice)}</td>
+                                        <td className="text-xs p-2">
+                                            {commonFunction.formatAsianNumber(((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice))}
+                                        </td>
                                     }
                                     {!packingSlip &&
                                         <td className="text-xs p-2">{commonFunction.formatAsianNumber(item.billItemDiscount)}</td>
                                     }
                                     {!packingSlip &&
-                                        <td className="text-xs p-2">{commonFunction.formatAsianNumber((item.quantity * item.billItemPrice) - ((item.quantity * item.billItemPrice) * item.billItemDiscount / 100))}</td>
+                                        <td className="text-xs p-2">
+                                            {commonFunction.formatAsianNumber(((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) -
+                                                (((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) * item.billItemDiscount / 100))}
+                                        </td>
                                     }
                                 </tr>
                             ))}
