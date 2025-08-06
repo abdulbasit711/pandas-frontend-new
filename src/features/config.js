@@ -1154,27 +1154,32 @@ export class Config {
             throw error;
         }
     }
-    async getDashboardData() {
-        try {
-            const response = await this.client.get(`/dashboard/get-dashboardData`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${authService.getAccessToken()}`
-                    }
-                });
-
-            if (response.data) {
-                console.log("dashboard data: ", response.data)
-                return response.data;
-            } else {
-                return null;
+    async getDashboardData(filterType = "monthly") {
+    try {
+        const response = await this.client.get(
+            `/dashboard/get-dashboardData`,
+            {
+                headers: {
+                    Authorization: `Bearer ${authService.getAccessToken()}`
+                },
+                params: {
+                    filter: filterType  // filterType could be: daily, weekly, monthly, 6months, yearly
+                }
             }
+        );
 
-        } catch (error) {
-            console.error("Error in fetching dashboard data:", error);
-            throw error;
+        if (response.data) {
+            console.log("dashboard data: ", response.data);
+            return response.data;
+        } else {
+            return null;
         }
+    } catch (error) {
+        console.error("Error in fetching dashboard data:", error);
+        throw error;
     }
+}
+
 
     async mergeAccounts({ ...data }) {
         try {

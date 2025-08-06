@@ -85,7 +85,7 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                             {bill.extraItems && bill.extraItems.map((item, index) => (
                                 <tr key={index} className="border border-gray-600">
                                     <td className="p-1">{commonFunction.truncateString(item.itemName, 21)}</td>
-                                    <td className="p-1 text-right">{item.quantity}</td>
+                                    <td className="p-1 text-right">{item.quantity} PCS</td>
                                     {!packingSlip && <td className="p-1 text-right">{commonFunction.formatAsianNumber(item.salePrice)}</td>}
                                     {!packingSlip && <td className="p-1 text-right">
                                         {commonFunction.formatAsianNumber((item.quantity * item.salePrice))}
