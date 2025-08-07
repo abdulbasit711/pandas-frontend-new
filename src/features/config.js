@@ -174,6 +174,26 @@ export class Config {
         }
     }
 
+    async getExpiryReport(days) {
+        try {
+            const response = await this.client.get(`/product/expiry-report?days=${days}`,
+                {
+                    headers: {
+                        Authorization: ` Bearer ${authService.getAccessToken()}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+            if (response.data) {
+                console.log("expiryReport: ", response.data)
+                return response.data;
+            }
+        } catch (error) {
+            console.error("Error in expiry report:", error);
+            throw error;
+        }
+    }
+
     async printBarcodes(productIds) {
         try {
             const response = await this.client.post(`product/barcode-pdf`,

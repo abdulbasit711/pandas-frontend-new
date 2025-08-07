@@ -35,6 +35,7 @@ import {
   ChangedPriceReport,
   StockSearch,
   ShortItemList,
+  ExpiryReport,
   //accounts
   Posting,
   OpeningAndAdjustmentBalance,
@@ -119,6 +120,8 @@ function Home() {
             return <ChangedPriceReport />;
           case 'short-item-list':
             return <ShortItemList />;
+          case 'expiry-report':
+            return <ExpiryReport />;
           default:
             return <MagicUiAnimation text='Stock Management' />;
         }
