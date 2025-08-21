@@ -296,6 +296,7 @@ const InvoiceComponent = () => {
     // dispatch(setFlatDiscount(totalDiscount));
     dispatch(setTotalAmount(totalAmount + totalExtraProductsTotalAmount));
     dispatch(setTotalGst(totalGst));
+    console.log('balance', balance)
     dispatch(setIsPaid(balance === 0 ? 'paid' : 'unpaid'));
   };
 
@@ -324,17 +325,17 @@ const InvoiceComponent = () => {
           billItemUnit: item.billItemUnit,
         }))
 
-        console.log('first', description,
-          'billType:', billType,
-          billPaymentType,
-          'customer:', customerId,
-          billItems,
-          'flatDiscount:', flatDiscount || 0,
-          'billStatus:', isPaid,
-          'totalAmount:', totalAmount || 0,
-          'paidAmount:', paidAmount || 0,
-          dueDate,
-          'extraItems:', extraProducts)
+        // console.log('first', description,
+        //   'billType:', billType,
+        //   billPaymentType,
+        //   'customer:', customerId,
+        //   billItems,
+        //   'flatDiscount:', flatDiscount || 0,
+        //   'billStatus:', isPaid,
+        //   'totalAmount:', totalAmount || 0,
+        //   'paidAmount:', paidAmount || 0,
+        //   dueDate,
+        //   'extraItems:', extraProducts)
 
         const response = await config.createInvoice({
           description,
@@ -343,7 +344,7 @@ const InvoiceComponent = () => {
           customer: customerId,
           billItems,
           flatDiscount: flatDiscount || 0,
-          billStatus: isPaid,
+          billStatus: parseInt(totalAmount - paidAmount - flatDiscount) === 0 ? 'paid' : 'unpaid',
           totalAmount: totalAmount || 0,
           paidAmount: paidAmount || 0,
           dueDate,
@@ -1149,7 +1150,7 @@ const InvoiceComponent = () => {
               className='w-24 text-xs p-1'
               checked={flatDiscount !== 0}
               onChange={(e) => {
-                e.target.checked ? dispatch(setFlatDiscount((totalAmount - flatDiscount + totalGst - paidAmount)))
+                e.target.checked ? dispatch(setFlatDiscount((totalAmount + totalGst - paidAmount)))
                   : dispatch(setFlatDiscount(0))
               }}
             />
@@ -1163,6 +1164,7 @@ const InvoiceComponent = () => {
               labelClass="w-40"
               className='w-24 text-xs p-1'
               value={(totalAmount && (totalAmount - flatDiscount + totalGst - paidAmount).toFixed(2)) || 0}
+              onChange={(e) => dispatch(setIsPaid(totalAmount === 0 ? 'paid' : 'unpaid'))}
               readOnly
             />
           </div>

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import UpdateBill from './bills/UpdateBill';
 import Button from '../../Button';
 import Input from '../../Input';
+import ButtonLoader from '../../ButtonLoader';
 import functions from "../../../features/functions"
 
 const ITEMS_PER_PAGE = 200; // Adjust as needed
@@ -19,6 +20,7 @@ function SoldItems() {
   const [remainingBalance, setRemainingBalance] = useState(0);
   const [validationMessage, setValidationMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [billId, setBillId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,6 +64,7 @@ function SoldItems() {
 
   const fetchAllBills = async () => {
     try {
+      setIsButtonLoading(true)
       const start = new Date(searchBillFilters.startDate);
       start.setHours(0, 0, 0, 0); // Set to the start of the day
       const end = new Date(searchBillFilters.endDate);
@@ -86,6 +89,7 @@ function SoldItems() {
       console.error('Error fetching bills:', error);
     } finally {
       setIsLoading(false);
+      setIsButtonLoading(false)
     }
   };
 
@@ -250,7 +254,7 @@ function SoldItems() {
               className="bg-primary hover:bg-primary/70 duration-200 text-white p-2 rounded"
               onClick={handleRetrieve}
             >
-              Retrieve
+              {isButtonLoading ? <ButtonLoader /> : 'Retrieve'}
             </button>
           </div>
         </div>

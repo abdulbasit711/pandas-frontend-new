@@ -12,7 +12,7 @@ const ViewBill = React.forwardRef((props, ref) => {
     const previousBalance = props.previousBalance
     const showPreviousBalance = props.showPreviousBalance
 
-    const exemptedParagraph = bill?.BusinessId?.exemptedParagraph?.split('۔')
+    const exemptedParagraph = bill?.BusinessId?.exemptedParagraph
 
     return bill && (
         <div className=' h-[28rem] shadow-lg overflow-y-auto scrollbar-thin'>
@@ -122,7 +122,7 @@ const ViewBill = React.forwardRef((props, ref) => {
                                     <td className="text-xs p-2">{bill?.billItems.length + index + 1}</td>
                                     <td className="text-xs p-2">{commonFunction.truncateString(item.itemName, 30)}</td>
                                     <td className="text-xs p-2"></td>
-                                    <td className="text-xs p-2">{item.quantity}</td>
+                                    <td className="text-xs p-2">{item.quantity} PCS</td>
                                     {!packingSlip && <td className="text-xs p-2">{commonFunction.formatAsianNumber(item.salePrice)}</td>}
                                     {!packingSlip && <td className="text-xs p-2">
                                         {commonFunction.formatAsianNumber((item.quantity * item.salePrice))}
