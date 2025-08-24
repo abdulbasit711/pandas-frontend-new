@@ -46,6 +46,7 @@ const InvoiceComponent = () => {
   const [productUnitError, setProductUnitError] = useState('');
   const [priceError, setPriceError] = useState('');
   const [billNo, setBillNo] = useState(0)
+  const [viewBillNo, setViewBillNo] = useState(0)
   const [description, setDescription] = useState('')
   const [billType, setBillType] = useState('thermal')
   const [billPaymentType, setBillPaymentType] = useState('cash')
@@ -71,6 +72,22 @@ const InvoiceComponent = () => {
   });
 
   const inputRef = useRef(null);
+
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (isInvoiceGenerated && e.key === "Enter") {
+        handleViewBill(viewBillNo);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [isInvoiceGenerated, viewBillNo]);
+
 
 
 
@@ -369,7 +386,9 @@ const InvoiceComponent = () => {
           dispatch(setExtraProducts([]))
         }
 
+        setViewBillNo(billNo)
         setIsInvoiceGenerated(true);
+        fetchLastBillNo(billType)
 
       } catch (error) {
         console.error('Failed to generate bill', error.response?.data?.message)
@@ -446,21 +465,23 @@ const InvoiceComponent = () => {
   //   }
   // }, [dispatch, customerIndex, customerData])
 
+  const fetchLastBillNo = async (billType) => {
+    setIsLoading(true)
+    try {
+      const response = await config.getLastBillNo(billType)
+      // console.log("resp", response.data.nextBillNo);
+      if (response) setBillNo(response.data.nextBillNo)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
 
   useEffect(() => {
 
-    const fetchLastBillNo = async (billType) => {
-      setIsLoading(true)
-      try {
-        const response = await config.getLastBillNo(billType)
-        // console.log("resp", response.data.nextBillNo);
-        if (response) setBillNo(response.data.nextBillNo)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+
 
     fetchLastBillNo(billType)
   }, [billType])
@@ -555,7 +576,11 @@ const InvoiceComponent = () => {
             </span>
             <h2 className={`${billError && 'text-red-500'} text-lg font-thin mb-4`}>{billError ? billError : 'Invoice generated successfully!'}</h2>
             {isInvoiceGenerated &&
-              <Button className='px-4 text-xs' onClick={() => handleViewBill(billNo)}>
+              <Button
+                ref={buttonRef}
+                className='px-4 text-xs'
+                onClick={() => handleViewBill(viewBillNo)}
+              >
                 View Invoice
               </Button>}
           </div>
