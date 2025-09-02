@@ -34,6 +34,7 @@ import config from '../../../features/config';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../../pages/Loader';
 import { useForm } from 'react-hook-form';
+import { extractErrorMessage } from '../../../utils/extractErrorMessage';
 
 
 const InvoiceComponent = () => {
@@ -391,9 +392,9 @@ const InvoiceComponent = () => {
         fetchLastBillNo(billType)
 
       } catch (error) {
-        console.error('Failed to generate bill', error.response?.data?.message)
-
-        setBillError(error.response?.data?.message)
+        console.error('Failed to generate bill', error.response.data)
+        const errorMessage = extractErrorMessage(error)
+        setBillError(errorMessage)
       } finally {
         setIsLoading(false)
 

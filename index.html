@@ -4,12 +4,51 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="./src/assets/pandas1.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, maximum-scale=0.6, user-scalable=yes">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, maximum-scale=0.6, user-scalable=yes">
   <title>Pandas</title>
 </head>
 
 <body class="bg-gray-100 overflow-x-hidden">
+  <div id="orientation-warning" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: #f8f8f8;
+  color: #333;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 9999;
+  font-size: 1.5rem;
+  padding: 2rem;
+">
+    Please rotate your device to <strong>landscape mode</strong> to continue using the app.
+  </div>
+
   <div id="root"></div>
+  <script>
+    function checkOrientation() {
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      const isLandscape = window.innerWidth > window.innerHeight;
+      const warning = document.getElementById('orientation-warning');
+      const root = document.getElementById('root');
+
+      if (isMobile && !isLandscape) {
+        warning.style.display = 'flex';
+        root.style.display = 'none';
+      } else {
+        warning.style.display = 'none';
+        root.style.display = 'block';
+      }
+    }
+
+    window.addEventListener('load', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+  </script>
+
   <script>
     // Corrected event listener for keyboard zoom prevention
     // document.addEventListener('keydown', function (event) {
