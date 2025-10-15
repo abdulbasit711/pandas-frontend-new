@@ -22,7 +22,6 @@ import { setAllProducts } from "../../../store/slices/products/productsSlice"
 import Input from "../../Input";
 import Button from "../../Button";
 import Loader from "../../../pages/Loader";
-import ButtonLoader from "../../ButtonLoader";
 
 const PurchaseItem = () => {
   const dispatch = useDispatch();
@@ -30,7 +29,6 @@ const PurchaseItem = () => {
   const [error, setError] = useState("");
   const [addSalePrice, setAddSalePrice] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [newProductLoading, setNewProductLoading] = useState(false);
   const [newProduct, setNewProduct] = useState({
     productName: '',
     productCode: '',
@@ -206,7 +204,7 @@ const PurchaseItem = () => {
       return;
     }
 
-    // setIsLoading(true);
+    setIsLoading(true);
     setError("");
 
     // Check if the vendor is a company or supplier
@@ -220,7 +218,6 @@ const PurchaseItem = () => {
     }
 
     try {
-      setNewProductLoading(true)
       const cleanedData = Object.fromEntries(
         Object.entries(newProduct).filter(([_, value]) => value !== "")
       );
@@ -277,7 +274,7 @@ const PurchaseItem = () => {
     } catch (error) {
       setError("Failed to add product. Please try again.");
     } finally {
-      setNewProductLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -433,9 +430,7 @@ const PurchaseItem = () => {
               <Button
                 onClick={() => { handleGenerateBill() }}
                 className='p-1 px-4'
-              >
-                {isLoading ? <ButtonLoader /> : 'Add'}
-              </Button>
+              >Add</Button>
             </div>
           ) : (
             // New Product Fields
@@ -622,9 +617,7 @@ const PurchaseItem = () => {
               <Button
                 onClick={handleAddNewProduct}
                 className='p-1 px-4'
-              >
-                {newProductLoading ? <ButtonLoader /> : 'Add New Product'}
-              </Button>
+              >Add New Product</Button>
             </div>
           )}
         </div>

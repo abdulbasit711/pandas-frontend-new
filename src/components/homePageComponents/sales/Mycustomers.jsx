@@ -22,11 +22,22 @@ function Mycustomers() {
   const [successMessage, setSuccessMessage] = useState('')
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
 
-  const filteredCustomers = newCustomerData; // No filtering needed in this case
-    const totalPages = Math.ceil(filteredCustomers.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, filteredCustomers.length);
-    const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
+  const [searchTerm, setSearchTerm] = useState('');
+
+
+  const filteredCustomers = newCustomerData.filter((customer) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      customer.customerName?.toLowerCase().includes(term) ||
+      customer.mobileNo?.toLowerCase().includes(term) ||
+      customer.customerRegion?.toLowerCase().includes(term)
+    );
+  });
+
+  const totalPages = Math.ceil(filteredCustomers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, filteredCustomers.length);
+  const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
 
 
   const {
@@ -54,15 +65,37 @@ function Mycustomers() {
     }
   }
 
-  const handleEdit = (id, name) => {
-    setCustomerId(id)
-    setIsEdit(true)
-    setCustomerName(name)
-    // console.log(id)
+  const handleEdit = (customer) => {
+    setCustomerId(customer._id);
+    setIsEdit(true);
+    setCustomerName(customer.customerName);
+
+    // pre-fill all fields in form
+    reset({
+      customerId: customer._id,
+      customerName: customer.customerName || "",
+      ntnNumber: customer.ntnNumber || "",
+      mobileNo: customer.mobileNo || "",
+      phoneNo: customer.phoneNo || "",
+      faxNo: customer.faxNo || "",
+      email: customer.email || "",
+      cnic: customer.cnic || "",
+      customerRegion: customer.customerRegion || "",
+      customerFlag: customer.customerFlag || "white"
+    });
+  };
+
+
+  const getDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+
+    });
   }
-
-
-
 
   const handleUpdateCustomer = async (data) => {
     console.log(data);
@@ -100,16 +133,38 @@ function Mycustomers() {
     <div className='bg-white rounded-lg'>
       <h2 className="text-lg text-center font-semibold py-4">All Customers</h2>
       {error && <p className="text-red-600 mt-2 mb-1 text-center text-sm">{error}</p>}
+
+      <div className="flex justify-between items-center mb-3 px-4">
+        <input
+          type="text"
+          placeholder="Search by name, mobile no, or region..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-1 w-1/2 text-sm focus:ring-1 focus:ring-gray-400 focus:outline-none"
+        />
+
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm('')}
+            className="text-sm text-red-500 hover:underline"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
       <div className="overflow-auto max-h-72 mb-4 scrollbar-thin rounded">
         <table className="min-w-full bg-white border text-xs">
           <thead className="sticky -top-1 border-b shadow-sm bg-gray-300 z-10">
             <tr>
               <th className="py-2 px-1 text-left">S No.</th>
               <th className="py-2 px-1 text-left">Customer Name</th>
-              <th className="py-2 px-1 text-left">Receivables</th>
-              <th className="py-2 px-1 text-left">Last Order</th>
+              <th className="py-2 px-1 text-left">Mobile No</th>
+              {/* <th className="py-2 px-1 text-left">Last Order</th> */}
+              <th className="py-2 px-1 text-left">Customer Region</th>
               <th className="py-2 px-1 text-left">Customer flag</th>
-              <th className="py-2 px-1 text-left"></th>
+              <th className="py-2 px-1 text-left">Created at</th>
+              <th className="py-2 px-1 text-left">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -117,13 +172,16 @@ function Mycustomers() {
               <tr key={index} className={`border-t hover:cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
                 <td className="py-1 px-2">{index + 1}</td>
                 <td className="py-1 px-2">{customer.customerName}</td>
-                <td className="py-1 px-2">{0}</td>
-                <td className="py-1 px-2">25/3/2024</td>
+                <td className="py-1 px-2">{customer.mobileNo}</td>
+                {/* <td className="py-1 px-2">25/3/2024</td> */}
+                <td className="py-1 px-2">{customer.customerRegion}</td>
                 <td className="py-1 px-2">{customer.customerFlag}<span className={`h-10 w-20  bg-${customer.customerFlag}-500`}></span></td>
+                <td className="py-1 px-2">{customer.createdAt && customer.createdAt &&
+                        getDate(customer.createdAt)}</td>
                 <td className="py-1 px-2">
                   <button
                     className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded-full"
-                    onClick={() => handleEdit(customer._id, customer.customerName)}
+                    onClick={() => handleEdit(customer)}
                   >Edit</button>
                 </td>
               </tr>
@@ -132,28 +190,28 @@ function Mycustomers() {
         </table>
       </div>
       {totalPages > 1 && (
-                    <div className="flex justify-between items-center mt-4 text-sm">
-                        <Button
-                            className={`px-4 py-2 rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-                            disabled={currentPage === 1}
-                        >
-                            Previous
-                        </Button>
+        <div className="flex justify-between items-center mt-4 text-sm">
+          <Button
+            className={`px-4 py-2 rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
 
-                        <span className="text-gray-700">
-                            Page {currentPage} of {totalPages}
-                        </span>
+          <span className="text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
 
-                        <Button
-                            className={`px-4 py-2 rounded-md ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                        >
-                            Next
-                        </Button>
-                    </div>
-                )}
+          <Button
+            className={`px-4 py-2 rounded-md ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   ) : <Loader message="Loading Data Please Wait...." mt="" h_w="h-10 w-10 border-t-2 border-b-2" />)
     :

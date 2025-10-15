@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
+  setAllProducts,
   setSearchQuery,
   setSearchQueryProducts,
   setSelectedItems,
@@ -34,7 +35,14 @@ import config from '../../../features/config';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../../pages/Loader';
 import { useForm } from 'react-hook-form';
+// import { saveQuotation } from '../../../utils/quotationStorage';
+import QuotationComponent from './quotation/QuotationComponent';
+import QuotationList from './quotation/QuotationList';
 import { extractErrorMessage } from '../../../utils/extractErrorMessage';
+import { useReactToPrint } from "react-to-print";
+import ViewBill from "./bills/ViewBill";
+import ViewBillThermal from "./bills/ViewBillThermal";
+import AddCustomer from './AddCustomer';
 
 
 const InvoiceComponent = () => {
@@ -53,6 +61,7 @@ const InvoiceComponent = () => {
   const [billPaymentType, setBillPaymentType] = useState('cash')
   const [customerIndex, setCustomerIndex] = useState('')
   const [customerFlag, setCustomerFlag] = useState('red')
+  const [selectedCustomer, setSelectedCustomer] = useState('');
   const [salesPerson, salesPalesPerson] = useState('')
   const [isInvoiceGenerated, setIsInvoiceGenerated] = useState(false);
   const [billError, setBillError] = useState('');
@@ -63,6 +72,12 @@ const InvoiceComponent = () => {
   const [addBalanceToDiscount, setAddBalanceToDiscount] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
+
+  const [showQuotationListModal, setShowQuotationListModal] = useState(false);
+
+  const [bill, setBill] = useState(null)
+
+  const [showAddCustomer, setShowAddCustomer] = useState(false)
 
   const [showAddExtraProductModal, setShowAddExtraProductModal] = useState(false);
   const [extraProduct, setExtraProduct] = useState({
@@ -88,9 +103,6 @@ const InvoiceComponent = () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [isInvoiceGenerated, viewBillNo]);
-
-
-
 
   const tableContainerRef = useRef(null);
 
@@ -169,52 +181,80 @@ const InvoiceComponent = () => {
   };
 
   const handleItemChange = (index, key, value) => {
-    const updatedItems = selectedItems.map((item, i) =>
-      i === index ? { ...item, [key]: value } : item
-    );
+    const updatedItems = selectedItems.map((item, i) => {
+      if (i === index) {
+        // Restrict quantity not to exceed maxQuantity
+        if (key === "quantity") {
+          const newQty = parseFloat(value) || 0;
+          if (newQty > item.productTotalQuantity / item.productPack) {
+            alert(`You cannot exceed stock limit! Max: ${Math.floor(item.productTotalQuantity / item.productPack)} ${item.quantityUnit}`);
+            return { ...item, quantity: Math.floor(item.productTotalQuantity / item.productPack) };
+          }
+          return { ...item, quantity: newQty };
+        }
+        if (key === "billItemUnit") {
+          const newUnits = parseInt(value) || 0;
+          if (newUnits > item.productTotalQuantity) {
+            alert(`You cannot exceed stock limit! Max: ${item.maxQuantity} ${item.packUnit}`);
+            return { ...item, billItemUnit: item.productTotalQuantity };
+          }
+          return { ...item, billItemUnit: newUnits };
+        }
+        return { ...item, [key]: value };
+      }
+      return item;
+    });
 
-    // Recalculate totals
-    updateTotals();
-
-    // Update selectedItems and totals in the state
     dispatch(setSelectedItems(updatedItems));
+    updateTotals();
   };
 
   const handleAddProduct = () => {
+    if (product.productTotalQuantity <= 0) {
+      alert("Product is out of stock!");
+      return;
+    }
     if (productName !== '') {
-      // Check if the product is already in selectedItems
       const existingProductIndex = selectedItems.findIndex(
         (item) => item._id === product._id
       );
 
       if (existingProductIndex >= 0) {
-        // If the product exists, update its quantity
+        // Already added: check stock before increasing
         const updatedItems = selectedItems.map((item, index) => {
           if (index === existingProductIndex) {
-            return {
-              ...item,
-              quantity: parseFloat(item.quantity) + parseFloat(productQuantity),
-            };
+            const newQty = parseFloat(item.quantity) + parseFloat(productQuantity);
+            if (newQty > item.maxQuantity) {
+              alert(`Cannot add more than ${item.maxQuantity} in stock.`);
+              return { ...item, quantity: item.maxQuantity };
+            }
+            return { ...item, quantity: newQty };
           }
           return item;
         });
 
         dispatch(setSelectedItems(updatedItems));
       } else {
-        // If the product does not exist, add it as a new product
+        // New product: check stock before adding
+        if (productQuantity > product.productTotalQuantity) {
+          alert(`You cannot add more than ${product.productTotalQuantity} in stock.`);
+          return;
+        }
+
         const newProduct = {
           ...product,
+          maxQuantity: product.productTotalQuantity,
           salePrice1: productPrice,
           quantity: productQuantity,
           discount: productDiscount,
-          billItemUnit: 0
+          billItemUnit: 0,
         };
 
-        console.log('updatedItems', selectedItems)
         dispatch(setSelectedItems([...selectedItems, newProduct]));
+        console.log('updatedItems', selectedItems);
       }
 
-      // Clear product details after adding
+      // Reset input fields
       dispatch(setSearchQueryProducts([]));
       dispatch(setProductName(''));
       dispatch(setProductCode(''));
@@ -321,7 +361,7 @@ const InvoiceComponent = () => {
 
   const generateInvoice = async () => {
 
-    if (!billType || !billPaymentType || !totalAmount) {
+    if (!billType || !totalAmount) {
       alert("Please fill all the required fields.");
       return;
     }
@@ -358,7 +398,7 @@ const InvoiceComponent = () => {
         const response = await config.createInvoice({
           description,
           billType,
-          billPaymentType,
+          billPaymentType: "cash",
           customer: customerId,
           billItems,
           flatDiscount: flatDiscount || 0,
@@ -390,6 +430,13 @@ const InvoiceComponent = () => {
         setViewBillNo(billNo)
         setIsInvoiceGenerated(true);
         fetchLastBillNo(billType)
+
+        if (response) {
+          const allProductsBefore = await config.fetchAllProducts();
+          if (allProductsBefore.data) {
+            dispatch(setAllProducts(allProductsBefore.data));
+          }
+        }
 
       } catch (error) {
         console.error('Failed to generate bill', error.response.data)
@@ -425,6 +472,47 @@ const InvoiceComponent = () => {
     }
   };
 
+  const generateQuotation = () => {
+    if (!billType || !billPaymentType || !totalAmount) {
+      alert("Please fill all the required fields.");
+      return;
+    }
+
+    const userConfirmed = window.confirm(
+      "Do you want to save this as a Quotation?"
+    );
+
+    if (userConfirmed) {
+      const quotation = {
+        id: Date.now(), // unique id
+        description,
+        billType,
+        billPaymentType,
+        customer: customerId,
+        billItems: selectedItems.map((item) => ({
+          productId: item._id,
+          quantity: item.quantity,
+          billItemDiscount: item.discount,
+          billItemPrice: item.salePrice1,
+          billItemPack: item.productPack,
+          billItemUnit: item.billItemUnit,
+        })),
+        flatDiscount: flatDiscount || 0,
+        totalAmount: totalAmount || 0,
+        paidAmount: paidAmount || 0,
+        dueDate,
+        extraItems: extraProducts,
+        createdAt: new Date().toISOString()
+      };
+
+      // save in localStorage
+      // saveQuotation(quotation);
+
+      alert("Quotation saved successfully ✅");
+    }
+  };
+
+
   const handleViewBill = (billNo) => {
     navigate(`/${primaryPath}/sales/view-bill/${billNo}`);
   }
@@ -436,6 +524,133 @@ const InvoiceComponent = () => {
   const filteredCustomers = customerData?.filter((customer) =>
     customer.customerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const componentRef = useRef();
+
+  // print hook
+  const handleDirectPrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
+  const handleFullyPaid = async () => {
+
+    if (!billType || !billPaymentType || !totalAmount) {
+      alert("Please fill all the required fields.");
+      return;
+    }
+
+    const userConfirmed = window.confirm(
+      "Are you sure you want to Generate the invoice? This action cannot be undone."
+    );
+
+    const billId = billNo || ""
+
+    if (!userConfirmed) return;
+
+    if (userConfirmed) {
+      setIsLoading(true)
+      console.log(selectedItems)
+      try {
+        const billItems = selectedItems.map((item) => ({
+          productId: item._id,
+          quantity: item.quantity,
+          billItemDiscount: item.discount,
+          billItemPrice: item.salePrice1,
+          billItemPack: item.productPack,
+          billItemUnit: item.billItemUnit,
+        }))
+
+        // console.log('first', description,
+        //   'billType:', billType,
+        //   billPaymentType,
+        //   'customer:', customerId,
+        //   billItems,
+        //   'flatDiscount:', flatDiscount || 0,
+        //   'billStatus:', isPaid,
+        //   'totalAmount:', totalAmount || 0,
+        //   'paidAmount:', paidAmount || 0,
+        //   dueDate,
+        //   'extraItems:', extraProducts)
+
+        const response = await config.createInvoice({
+          description,
+          billType,
+          billPaymentType: "cash",
+          customer: customerId,
+          billItems,
+          flatDiscount: 0,
+          billStatus: 'paid',
+          totalAmount: totalAmount || 0,
+          paidAmount: totalAmount || 0,
+          dueDate,
+          extraItems: extraProducts
+        });
+
+        if (response) {
+          console.log("response: ", response);
+          dispatch(setSelectedItems([]))
+          dispatch(setFlatDiscount(0))
+          dispatch(setTotalQty(0))
+          dispatch(setTotalAmount(0))
+          dispatch(setTotalGrossAmount(0))
+          dispatch(setPaidAmount(''))
+          dispatch(setPreviousBalance(0))
+          dispatch(setProductName(''))
+          dispatch(setProductQuantity(''))
+          dispatch(setProductDiscount(''))
+          dispatch(setProductPrice(''))
+          dispatch(setProduct({}))
+          dispatch(setCustomer(null));
+          dispatch(setExtraProducts([]))
+
+        }
+        setViewBillNo(billNo)
+        fetchLastBillNo(billType)
+
+        if (response) {
+          const allProductsBefore = await config.fetchAllProducts();
+          if (allProductsBefore.data) {
+            dispatch(setAllProducts(allProductsBefore.data));
+          }
+        }
+
+      } catch (error) {
+        console.error('Failed to generate bill', error.response.data)
+        const errorMessage = extractErrorMessage(error)
+        setBillError(errorMessage)
+      } finally {
+        setIsLoading(false)
+
+      }
+    }
+
+    if (!billError) {
+
+      try {
+        setIsLoading(true)
+        const response = await config.fetchSingleBill(billNo)
+
+        if (response.data) {
+          setBill(response.data);
+        }
+      } catch (error) {
+        const errorMessage = extractErrorMessage(error)
+        setBillError(errorMessage)
+      } finally {
+        setIsLoading(false)
+
+      }
+    }
+
+
+  };
+
+  useEffect(() => {
+    if (bill) {
+      handleDirectPrint();
+      setBill(null)
+    }
+  }, [bill]);
 
   useEffect(() => {
     console.log('extraProducts', extraProducts)
@@ -466,6 +681,7 @@ const InvoiceComponent = () => {
   //   }
   // }, [dispatch, customerIndex, customerData])
 
+
   const fetchLastBillNo = async (billType) => {
     setIsLoading(true)
     try {
@@ -481,8 +697,6 @@ const InvoiceComponent = () => {
 
 
   useEffect(() => {
-
-
 
     fetchLastBillNo(billType)
   }, [billType])
@@ -562,6 +776,13 @@ const InvoiceComponent = () => {
     }
   }, [selectedItems]);
 
+  useEffect(() => {
+    if (selectedCustomer === 'add') {
+      setShowAddCustomer(true);
+      setSelectedCustomer(''); // reset to avoid re-triggering modal
+    }
+  }, [selectedCustomer]);
+
   return (!isLoading ?
     (<div className="w-full mx-auto p-2 bg-white rounded shadow-lg overflow-auto max-h-[90vh]">
 
@@ -577,11 +798,7 @@ const InvoiceComponent = () => {
             </span>
             <h2 className={`${billError && 'text-red-500'} text-lg font-thin mb-4`}>{billError ? billError : 'Invoice generated successfully!'}</h2>
             {isInvoiceGenerated &&
-              <Button
-                ref={buttonRef}
-                className='px-4 text-xs'
-                onClick={() => handleViewBill(viewBillNo)}
-              >
+              <Button className='px-4 text-xs' onClick={() => handleViewBill(viewBillNo)}>
                 View Invoice
               </Button>}
           </div>
@@ -655,6 +872,46 @@ const InvoiceComponent = () => {
         </div>
       )}
 
+      {showAddCustomer && (
+        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40'
+          onClick={() => setShowAddCustomer(false)
+          }
+        >
+          <AddCustomer
+            onCustomerCreated={(newCustomer) => {
+              // automatically select newly created customer
+              dispatch(setCustomer(newCustomer?._id));
+              setCustomerFlag(newCustomer?.customerFlag);
+              setSelectedCustomer(newCustomer._id);
+              // setShowAddCustomer(false); // close modal
+            }}
+          />
+        </div>
+      )}
+
+      <div style={{ display: "none" }}>
+        {billType === "thermal" ? (
+          <ViewBillThermal
+            ref={componentRef}
+            bill={bill ? bill : {}}
+            packingSlip={false}
+            exemptedParagraph={false}
+            showPreviousBalance={false}
+            previousBalance={0}
+          />
+        ) : (
+          <ViewBill
+            ref={componentRef}
+            bill={bill ? bill : {}}
+            packingSlip={false}
+            exemptedParagraph={false}
+            showPreviousBalance={false}
+            previousBalance={0}
+          />
+        )}
+      </div>
+
+
 
       {/* Invoice Information */}
       <div className="mb-2">
@@ -679,15 +936,23 @@ const InvoiceComponent = () => {
             onChange={(e) => dispatch(setDate(e.target.value))}
           />
 
-          <Input
-            label='Description:'
-            placeholder='Enter Description'
-            divClass="flex items-center"
-            labelClass="w-28"
-            className='w-44 text-xs p-1 '
-            value={description || ''}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          <div className='flex gap-2'>
+            <Input
+              label='Description:'
+              placeholder='Enter Description'
+              divClass="flex items-center"
+              labelClass="w-20"
+              className='w-28 text-xs p-1 '
+              value={description || ''}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+
+            <Button className={`w-40 px-4 ${billType === 'thermal' ? 'hover:bg-red-800' : 'hover:bg-gray-700'}`}
+              bgColor={billType === 'thermal' ? 'bg-red-600' : A4Color.a4500}
+              onClick={clearInvoice}>
+              <p className='text-xs text-white'>Clear Invoice</p>
+            </Button>
+          </div>
 
 
           {/* <div className='grid grid-cols-2'> */}
@@ -703,14 +968,16 @@ const InvoiceComponent = () => {
             </select>
           </label>
 
-          <label className="ml-1 flex items-center">
-            <span className="w-28">Payment Type: <span className='text-red-600'>*</span></span>
-            <select onChange={(e) => setBillPaymentType(e.target.value)} className={`${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100} border p-1 rounded text-xs w-44`}>
-              <option value="cash">Cash</option>
-              <option value="credit">Credit</option>
-            </select>
-          </label>
-          {/* </div> */}
+          <Input
+            label='Due Date:'
+            divClass="flex items-center "
+            type="date"
+            labelClass="w-28 text-red-600"
+            className='w-44 text-xs p-1 text-red-600'
+            value={dueDate || ''}
+            onChange={(e) => setDueDate(e.target.value)}
+          >
+          </Input>
 
           <label className="ml-1 flex gap-2 items-start"> {/* Changed to flex-col and items-start */}
             <span className="w-28 mb-1">Customer Name:</span> {/* Added margin-bottom for spacing */}
@@ -722,16 +989,21 @@ const InvoiceComponent = () => {
               onChange={handleSearch}
             />
             <select
+              value={selectedCustomer}
               onChange={(e) => {
                 const customerId = e.target.value;
+                setSelectedCustomer(customerId);
                 dispatch(setCustomer(customerId));
                 const customer = customerData.find((c) => c._id === customerId);
                 setCustomerFlag(customer?.customerFlag); // Added optional chaining
-                console.log('customerFlag', customer?.customerFlag); // Added optional chaining
+                // console.log('customerFlag', customer?.customerFlag); // Added optional chaining
               }}
               className={`${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100} border p-1 rounded text-xs w-full`}
             >
               <option value="">Select Customer</option>
+              <option value="add"
+                onClick={() => setShowAddCustomer(true)}
+              >+ Add New Customer</option>
               {filteredCustomers?.map((customer, index) => (
                 <option
                   key={index}
@@ -775,7 +1047,12 @@ const InvoiceComponent = () => {
                 );
 
                 if (product) {
-                  handleSelectProduct(product);
+                  const newProduct = {
+                    ...product,
+                    maxQuantity: product.productTotalQuantity
+                  }
+                  console.log('product', newProduct)
+                  handleSelectProduct(newProduct);
                   setTimeout(() => {
                     handleAddProduct();
                   }, 100);
@@ -797,16 +1074,85 @@ const InvoiceComponent = () => {
           />
 
 
-          <Input
-            label='Due Date:'
-            divClass="flex items-center col-span-4 w-52"
-            type="date"
-            labelClass="w-24 text-red-600"
-            className='w-56 text-xs p-1 text-red-600'
-            value={dueDate || ''}
-            onChange={(e) => setDueDate(e.target.value)}
-          >
-          </Input>
+          <div className='col-span-2 flex items-center'>
+            <div className={`w-full rounded-md ${billType === 'thermal' ? "bg-purple-500" : A4Color.a4100}`}>
+              <QuotationComponent
+                selectedItems={selectedItems}
+                totalAmount={totalAmount}
+                billType={billType}
+                billPaymentType={billPaymentType}
+              />
+            </div>
+          </div>
+
+          <div className='col-span-2 flex items-center'>
+            <Button
+              className="px-4 w-40 hover:bg-emerald-800"
+              bgColor={billType === 'thermal' ? "bg-emerald-700" : A4Color.a4500}
+              onClick={() => setShowQuotationListModal(true)}
+            >
+              <p className="text-xs text-white">Quotation List</p>
+            </Button>
+          </div>
+
+          {showQuotationListModal &&
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
+              <QuotationList
+                onClose={() => setShowQuotationListModal(false)}
+                onLoadQuotation={(q) => {
+                  // Prefer full payload if available
+                  const payload = q.payload ?? {};
+
+                  // If you want to restore raw selected items directly:
+                  const items =
+                    payload._rawSelectedItems ??
+                    q.items ?? // older minimal schema
+                    [];
+
+                  // --- Redux restores (adjust import paths) ---
+                  // set invoice core fields
+                  dispatch(setSelectedItems(items));
+                  dispatch(setFlatDiscount(payload.flatDiscount ?? 0));
+                  dispatch(setTotalAmount(payload.totalAmount ?? q.total ?? 0));
+                  dispatch(setPaidAmount(payload.paidAmount ?? 0));
+                  dispatch(setPreviousBalance(0)); // if you track it
+                  // Optional resets:
+                  dispatch(setTotalQty(0));
+                  dispatch(setTotalGrossAmount(0));
+                  dispatch(setProductName(""));
+                  dispatch(setProductQuantity(""));
+                  dispatch(setProductDiscount(""));
+                  dispatch(setProductPrice(""));
+                  dispatch(setProduct({}));
+
+                  // set customer & meta if you track them in Redux/local state
+                  if (payload.customer !== undefined) {
+                    dispatch(setCustomer(payload.customer ?? null));
+                  }
+                  if (payload.description !== undefined) {
+                    setDescription(payload.description ?? "");
+                  }
+                  // if (payload.billPaymentType !== undefined) {
+                  //   setBillPaymentType(payload.billPaymentType ?? "");
+                  // }
+
+                  setBillPaymentType("cash");
+
+                  if (payload.dueDate !== undefined) {
+                    setDueDate(payload.dueDate ?? "");
+                  }
+                  if (payload.extraItems !== undefined) {
+                    dispatch(setExtraProducts(payload.extraItems ?? []));
+                  }
+
+                  alert(`Quotation "${q.name}" loaded into invoice ✅`);
+                }}
+              />
+            </div>
+
+          }
+
+
 
           <Input
             label='Discount %:'
@@ -881,11 +1227,11 @@ const InvoiceComponent = () => {
             {priceError && <p className="pl-2 text-red-500 text-xs">{priceError}</p>}
           </Input>
 
-          <div className='col-span-2'>
+          <div className='col-span-2 '>
             <Button className={`w-40 px-4 ${billType === 'thermal' ? 'hover:bg-red-800' : 'hover:bg-gray-700'}`}
-              bgColor={billType === 'thermal' ? 'bg-red-600' : A4Color.a4500}
-              onClick={clearInvoice}>
-              <p className='text-xs text-white'>Clear Invoice</p>
+              bgColor={billType === 'thermal' ? 'bg-cyan-600' : A4Color.a4500}
+              onClick={handleFullyPaid}>
+              <p className='text-xs text-white'>Fully Paid</p>
             </Button>
           </div>
 
@@ -894,7 +1240,7 @@ const InvoiceComponent = () => {
 
             <Button
               className={`w-40 px-4 ${billType === 'thermal' ? 'hover:bg-green-800' : 'hover:bg-gray-700'}`}
-              bgColor={billType === 'thermal' ? 'bg-green-600' : A4Color.a4500}
+              bgColor={billType === 'thermal' ? 'bg-green-600' : 'bg-primary'}
               onClick={generateInvoice}
             >
               <p className='text-xs text-white'>Generate Invoice</p>
@@ -905,9 +1251,9 @@ const InvoiceComponent = () => {
 
         {/* Search Result Table */}
         {searchQuery && (
-          <div className="mt-2 -ml-2 overflow-auto absolute w-[81%] max-h-72 overflow-y-auto   scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 z-20">
+          <div className="mt-2 -ml-2 overflow-auto absolute w-[81%] max-h-72 overflow-y-auto bg-white   scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 z-20">
             <table className={`min-w-full ${billType === 'thermal' ? thermalColor.th200 : A4Color.a4200} border text-xs`}>
-              <thead className={`${billType === 'thermal' ? thermalColor.th300 : A4Color.a4300} sticky -top-0  border-b shadow-sm z-10`}>
+              <thead className={`bg-primary sticky -top-0 text-white  border-b shadow-sm z-10`}>
                 <tr>
                   <th className="py-2 px-1 text-left">Code</th>
                   <th className="py-2 px-1 text-left">Name</th>
@@ -918,6 +1264,7 @@ const InvoiceComponent = () => {
                   <th className="py-2 px-1 text-left">Category</th>
                   <th className="py-2 px-1 text-left">Sale Price</th>
                   <th className="py-2 px-1 text-left">Total Qty</th>
+                  <th className="py-2 px-1 text-left">Total Units</th>
                 </tr>
               </thead>
               <tbody>
@@ -946,6 +1293,7 @@ const InvoiceComponent = () => {
                       )}
                     </td>
                     <td className="px-1 py-1">{Math.ceil(product.productTotalQuantity / product.productPack)}</td>
+                    <td className="px-1 py-1">{Math.ceil(product.productTotalQuantity)} {product.packUnit?.toUpperCase()}</td>
 
                   </tr>
                 )) : <tr className='text-center w-full'>
@@ -960,9 +1308,7 @@ const InvoiceComponent = () => {
       <div>
         <div className="overflow-auto  max-h-40 scrollbar-thin" ref={tableContainerRef}>
           <table className="min-w-full bg-white border text-xs ">
-            <thead className={`${billType === 'thermal' ?
-              thermalColor.th300 :
-              A4Color.a4300} sticky -top-0  border-b shadow-sm z-10`}>
+            <thead className={`bg-primary/80 sticky text-white -top-0  border-b shadow-sm z-10`}>
               <tr className={` border-b`}>
                 <th className="py-2 px-1 text-left">S No</th>
                 <th className="py-2 px-1 text-left">Name</th>
@@ -981,7 +1327,7 @@ const InvoiceComponent = () => {
                 const netAmount = (grossAmount * (1 - item.discount / 100)).toFixed(2);
 
                 return (
-                  <tr key={index} className={`border-t ${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100}`}>
+                  <tr key={index} className={`border-t bg-primary/20`}>
                     <td className=" px-1">{index + 1}</td>
                     <td className=" px-1">{item.productName}</td>
                     <td className=" px-1 flex items-start">
@@ -1003,9 +1349,9 @@ const InvoiceComponent = () => {
                             type="number"
                             className={`p-1 rounded w-16 text-xs ${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100}`}
                             value={item.billItemUnit || ''}
-                            max={item.productPack}
+                            // max={item.productPack}
                             onChange={(e) => {
-                              if (e.target.value > item.productPack || e.target.value < 0) return;
+                              // if (e.target.value > item.productPack || e.target.value < 0) return;
                               handleItemChange(index, "billItemUnit", parseInt(e.target.value))
                             }}
                           />
@@ -1017,8 +1363,14 @@ const InvoiceComponent = () => {
                       <input
                         type="text"
                         className={`p-1 rounded w-16 text-xs ${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100} bg-white`}
-                        value={(item.salePrice1).toFixed(2) || ''}
-                        onChange={(e) => handleItemChange(index, "salePrice1", parseFloat(e.target.value))}
+                        value={
+                          typeof item.salePrice1 === "number" && !isNaN(item.salePrice1)
+                            ? item.salePrice1.toFixed(2)
+                            : ""
+                        }
+                        onChange={(e) =>
+                          handleItemChange(index, "salePrice1", parseFloat(e.target.value) || 0)
+                        }
                       />
                     </td>
                     <td className=" px-1">{grossAmount.toFixed(2)}</td>
@@ -1049,7 +1401,7 @@ const InvoiceComponent = () => {
                 const netAmount = (grossAmount).toFixed(2);
 
                 return (
-                  <tr key={index} className={`border-t ${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100}`}>
+                  <tr key={index} className={`border-t bg-primary/20`}>
                     <td className=" px-1">{selectedItems.length + index + 1}</td>
                     <td className=" px-1">{item.itemName}</td>
                     <td className=" px-1">{item.quantity}</td>
@@ -1079,7 +1431,7 @@ const InvoiceComponent = () => {
 
 
       {/* Totals Section */}
-      <div className={`mt-4 p-2 border-t border-gray-300 ${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100}`}>
+      <div className={`mt-4 p-2 border-t border-gray-300 bg-primary/30`}>
         <div className="grid grid-cols-3 gap-2 text-xs">
           <div className="col-span-1">
 

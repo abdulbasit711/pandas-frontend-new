@@ -2,6 +2,8 @@
 import React from 'react';
 import Logo from '../../../Logo';
 import commonFunction from '../../../../features/functions';
+import billLogo from '../../../../assets/billLogo.jpg'
+import paymentQR from '../../../../assets/paymentQR.jpg'
 // import { useSelector } from 'react-redux';
 
 // ViewBill component wrapped in forwardRef
@@ -11,6 +13,7 @@ const ViewBill = React.forwardRef((props, ref) => {
     const packingSlip = props.packingSlip
     const previousBalance = props.previousBalance
     const showPreviousBalance = props.showPreviousBalance
+    const showExemptedParagraph = props.exemptedParagraph
 
     const exemptedParagraph = bill?.BusinessId?.exemptedParagraph
 
@@ -20,11 +23,21 @@ const ViewBill = React.forwardRef((props, ref) => {
                 {/* Business Information */}
                 <div className="flex justify-center">
 
-                    <div className='text-center'>
-                        <h2 className="text-2xl font-bold pb-2">{bill?.BusinessId?.businessName}</h2>
-                        <p className="text-sm">{bill?.storeAddress}</p>
-                        <p className="text-sm"><span className='font-bold'>Phone</span> &#128382;: {bill?.BusinessId?.owner?.mobileno?.map((num, i) => <span className='px-1' key={i}>{num}</span>)} | <span className='font-bold'>Address</span> &#10003;: {bill?.BusinessId?.businessRegion}</p>
-                        <h3 className="text-xl font-bold mt-4">{packingSlip ? 'Packing Slip' : 'Sale Invoice'}</h3>
+                    <div className='ml-5'>
+                        <img src={billLogo} alt="" className='w-36' />
+                    </div>
+
+                    <div className='text-center w-full'>
+                        <div className='flex pl-4'>
+                            
+                            <div className='flex items-end justify-center ml-5'>
+                                <span className='text-4xl font-extrabold pb-2 pr-2'>PARKO </span> <h2 className="text-xl font-bold pb-2"> ELECTRIC AND ELECTRONICS</h2>
+                                <span className='text-xs pb-6 pl-2'>RTM 294967</span>
+                            </div>
+                        </div>
+                        <p className="text-sm ">{bill?.storeAddress}</p>
+                        <p className="text-sm text-left ml-10 "><span className='font-bold'>Phone</span> &#128382;: {bill?.BusinessId?.owner?.mobileno?.map((num, i) => <span className='px-1' key={i}>{num}</span>)} | <span className='font-bold'>Address</span> &#10003;: {bill?.BusinessId?.businessRegion}</p>
+                        <h3 className="text-xl font-bold mt-4 text-left ml-10">{packingSlip ? 'Packing Slip' : 'Sale Invoice'}</h3>
                     </div>
                     <div></div>
                 </div>
@@ -63,14 +76,15 @@ const ViewBill = React.forwardRef((props, ref) => {
                 {/* Items Section */}
                 <div className="my-6">
                     <table className="w-full border">
-                        <thead className="border-2">
+                        <thead className="border-2 border-black">
                             <tr>
                                 <th className="text-xs text-left p-2">No.</th>
                                 <th className="text-xs text-left p-2">Item Name</th>
                                 <th className="text-xs text-left p-2">Company</th>
                                 <th className="text-xs text-left p-2">Qty</th>
+                                <th className="text-xs text-left p-2">Units/pack</th>
                                 {
-                                    !packingSlip && <th className="text-xs text-left p-2">Rate</th>}
+                                    !packingSlip && <th className="text-xs text-left p-2">Rate/pack</th>}
                                 {
                                     !packingSlip && <th className="text-xs text-left p-2">Gross Am.</th>}
                                 {
@@ -84,21 +98,27 @@ const ViewBill = React.forwardRef((props, ref) => {
                         </thead>
                         <tbody>
                             {bill?.billItems && bill?.billItems.map((item, index) => (
-                                <tr key={index} className="break-inside-avoid border-2">
+                                <tr key={index} className="break-inside-avoid border-2 border-black">
                                     <td className="text-xs p-2">{index + 1}</td>
-                                    <td className="text-xs p-2">{commonFunction.truncateString(item.productId.productName, 30)}</td>
+                                    <td className="text-xs p-2">{commonFunction.truncateString(item.productId.productName, 50)}</td>
                                     <td className="text-xs p-2">{commonFunction.truncateString(item.productId?.companyId?.companyName, 13)}</td>
                                     <td className="text-xs p-2">
                                         <div>
-                                            {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? (item.billItemUnit) : (item.quantity + item.billItemUnit / item.billItemPack)}
-                                            <span> {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? (item.productId.packUnit)?.toUpperCase() || 'PCS' : (item.productId.quantityUnit)?.toUpperCase() || 'PCS'}</span>
+                                            {((item.quantity + item.billItemUnit / item.billItemPack) < 1 || item.quantity === 0) ? (item.billItemUnit) : (item.quantity + item.billItemUnit / item.billItemPack)?.toFixed(2)}
+                                            <span> {((item.quantity + item.billItemUnit / item.billItemPack) < 1 || item.quantity === 0) ? (item.productId.packUnit)?.toUpperCase() || 'PCS' : (item.productId.quantityUnit)?.toUpperCase() || 'PCS'}</span>
                                         </div>
+                                    </td>
+                                    <td className="text-xs p-2">
+                                        {item.billItemPack + " " + (item.productId?.packUnit?.toUpperCase() ||"PCS")}
                                     </td>
                                     {!packingSlip &&
                                         <td className="text-xs p-2">
-                                            {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? commonFunction.formatAsianNumber(((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) -
-                                                (((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) * item.billItemDiscount / 100)) : commonFunction.formatAsianNumber(item.billItemPrice)}
+                                            {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? commonFunction.formatAsianNumber(item.billItemPrice / item.billItemPack) : commonFunction.formatAsianNumber(item.billItemPrice)}
                                         </td>
+                                        // <td className="text-xs p-2">
+                                        //     {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? commonFunction.formatAsianNumber(((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) -
+                                        //         (((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) * item.billItemDiscount / 100)) : commonFunction.formatAsianNumber(item.billItemPrice)}
+                                        // </td>
                                     }
                                     {!packingSlip &&
                                         <td className="text-xs p-2">
@@ -118,7 +138,7 @@ const ViewBill = React.forwardRef((props, ref) => {
                             ))}
 
                             {bill.extraItems && bill.extraItems.map((item, index) => (
-                                <tr key={index} className="text-xs break-inside-avoid border-2">
+                                <tr key={index} className="text-xs break-inside-avoid border-2 border-black">
                                     <td className="text-xs p-2">{bill?.billItems.length + index + 1}</td>
                                     <td className="text-xs p-2">{commonFunction.truncateString(item.itemName, 30)}</td>
                                     <td className="text-xs p-2"></td>
@@ -138,28 +158,26 @@ const ViewBill = React.forwardRef((props, ref) => {
                 </div>
                 {/* Totals Section */}
                 {!packingSlip &&
-                    <div className='flex  justify-end'>
-                        <div className=" mb-4 text-l w-5/12">
-                            <p className='font-semibold'><span className='inline-block font-medium w-44'>Total Gross Amount:</span> {bill && commonFunction.formatAsianNumber(bill.totalAmount)}</p>
-                            <p className='font-semibold'><span className='inline-block font-medium w-44'>Discount Amount:</span> {bill && commonFunction.formatAsianNumber(bill.flatDiscount)}</p>
-                            <p className='font-semibold'><span className='inline-block font-medium w-44'>Paid Amount:</span> {bill && commonFunction.formatAsianNumber(bill.paidAmount)}</p>
-                            <p className='font-bold'><span className='inline-block font-medium w-44'>Bill Balance:</span> {bill && commonFunction.formatAsianNumber(bill?.totalAmount - bill?.flatDiscount - bill?.paidAmount)}</p>
-                            {showPreviousBalance && <p className='font-bold'><span className='inline-block font-medium w-44'>Previous Balance:</span><span className='underline'> {previousBalance && commonFunction.formatAsianNumber(previousBalance - (bill?.totalAmount - bill?.flatDiscount - bill?.paidAmount))}</span></p>}
-                            {showPreviousBalance && <p className='font-bold'><span className='inline-block font-medium w-44'>Total Balance:</span> {previousBalance && commonFunction.formatAsianNumber(previousBalance)}</p>}
+                    <div className='grid grid-cols-2 '>
+                        <div className='flex justify-start pl-5'>
+                            <img src={paymentQR} alt="" className=' h-32' />
+                        </div>
+                        <div className='flex justify-end pr-5'>
+                            <div className=" mb-4 text-l border-2 border-black p-3">
+                                <p className='font-semibold'><span className='inline-block font-medium w-44'>Total Gross Amount:</span> {bill && commonFunction.formatAsianNumber(bill.totalAmount)}</p>
+                                <p className='font-semibold'><span className='inline-block font-medium w-44'>Discount Amount:</span> {bill && commonFunction.formatAsianNumber(bill.flatDiscount)}</p>
+                                <p className='font-semibold'><span className='inline-block font-medium w-44'>Paid Amount:</span> {bill && commonFunction.formatAsianNumber(bill.paidAmount)}</p>
+                                <p className='font-bold'><span className='inline-block font-medium w-44'>Bill Balance:</span> {bill && commonFunction.formatAsianNumber(bill?.totalAmount - bill?.flatDiscount - bill?.paidAmount)}</p>
+                                {showPreviousBalance && <p className='font-bold'><span className='inline-block font-medium w-44'>Previous Balance:</span><span className='underline'> {previousBalance && commonFunction.formatAsianNumber(previousBalance - (bill?.totalAmount - bill?.flatDiscount - bill?.paidAmount))}</span></p>}
+                                {showPreviousBalance && <p className='font-bold'><span className='inline-block font-medium w-44'>Total Balance:</span> {previousBalance && commonFunction.formatAsianNumber(previousBalance)}</p>}
+                            </div>
                         </div>
                     </div>
                 }
 
-                {/* {!packingSlip &&
-                    <div className='mt-3'>
-                        <p className='text-[12px] text-right'>نوٹ:  کوئی بھی آئیٹم واپس یا تبدیل ہو سکتا ہے بشرطیکہ وہ اپنی اصلی حالت میں ہو اور مکمل پیکنگ میں ہو۔ چائنہ آئیٹمز کی واپسی نہیں ہوگی۔ کسی بھی آئٹم کی واپسی صرف بل یا رسید کی موجودگی میں ہی قابل قبول ہوگی۔ </p>
-
-                    </div>
-                } */}
-
                 {/* Signature Section */}
                 <div className=''>
-                    {exemptedParagraph &&
+                    {showExemptedParagraph &&
                         <div className="text-center mt-3 text-xs font-semibold ">
                             {exemptedParagraph}
                         </div>

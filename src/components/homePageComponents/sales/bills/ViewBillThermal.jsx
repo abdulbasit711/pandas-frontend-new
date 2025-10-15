@@ -3,6 +3,7 @@ import React from 'react';
 import Logo from '../../../Logo';
 import commonFunction from '../../../../features/functions';
 import Barcode from 'react-barcode';
+import thermalLogo from '../../../../assets/thermalLogo.jpg'
 
 
 // ViewBill component wrapped in forwardRef
@@ -12,13 +13,14 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
     const packingSlip = props.packingSlip
     const previousBalance = props.previousBalance
     const showPreviousBalance = props.showPreviousBalance
+    const showExemptedParagraph = props.exemptedParagraph
     // console.log(exemptedParagraph)
 
 
 
     return bill && (
         <div className="thermal-bill mt-5 w-[80mm] min-h-[24rem] max-h-72 shadow-lg overflow-y-auto scrollbar-thin mx-auto">
-            <div ref={ref} className="view-bill p-2 bg-white">
+            <div ref={ref} className="view-bill p-2 bg-white text-black">
 
                 {/* Business Information */}
                 <div className="text-center mb-2">
@@ -65,14 +67,13 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                                     <td className="p-1">{commonFunction.truncateString(item.productId.productName, 21)}</td>
                                     <td className="p-1 text-center pl-8">
                                         <div>
-                                            {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? (item.billItemUnit) : (item.quantity + item.billItemUnit / item.billItemPack) }
-                                            <span> {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? (item.productId.packUnit)?.toUpperCase() || 'PCS' : (item.productId.quantityUnit)?.toUpperCase() || 'PCS' }</span>
+                                            {((item.quantity + item.billItemUnit / item.billItemPack) < 1 || item.quantity === 0) ? (item.billItemUnit) : (item.quantity + item.billItemUnit / item.billItemPack)?.toFixed(2) }
+                                            <span> {((item.quantity + item.billItemUnit / item.billItemPack) < 1 || item.quantity === 0) ? (item.productId.packUnit)?.toUpperCase() || 'PCS' : (item.productId.quantityUnit)?.toUpperCase() || 'PCS' }</span>
                                         </div>
                                     </td>
                                     {!packingSlip && 
                                     <td className="p-1 text-right">
-                                        {(item.quantity + item.billItemUnit / item.billItemPack) < 1 ? commonFunction.formatAsianNumber(((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) -
-                                            (((item.quantity + item.billItemUnit / item.billItemPack) * item.billItemPrice) * item.billItemDiscount / 100)) : commonFunction.formatAsianNumber(item.billItemPrice)}
+                                        {((item.quantity + item.billItemUnit / item.billItemPack) < 1 || item.quantity === 0) ? commonFunction.formatAsianNumber(item.billItemPrice / item.billItemPack) : commonFunction.formatAsianNumber(item.billItemPrice)}
                                     </td>
                                     }
                                     {!packingSlip && <td className="p-1 text-right">
@@ -132,7 +133,7 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                 </div> */}
 
                 {/* Footer Section */}
-                {exemptedParagraph &&
+                {showExemptedParagraph &&
                     <div className="text-center mt-3 text-xs font-semibold ">
                         {exemptedParagraph}
                     </div>
@@ -152,8 +153,10 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                     </div>
                 )}
 
+                <p className=' text-center text-xs'>Thank You For Shopping!</p>
+
                 <div className='flex justify-center mt-2'>
-                    <Logo width='w-10 h-10' className='rounded-full opacity-90 hue-rotate-180' />
+                    <img src={thermalLogo} className='h-10' alt="Pandas" />
 
                 </div>
                 <div className='text-center text-[8px]'>Software by Pandas. 📞 03103480229 🌐 www.pandas.com.pk</div>

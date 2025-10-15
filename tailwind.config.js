@@ -17,8 +17,10 @@ export default {
         slideDown: 'slideDown o.75s ease-out'
       },
       colors: {
-        primary: '#0c9cdc',
-        primaryHover: '#278eba'
+        // primary: '#0c9cdc',
+        // primaryHover: '#278eba'
+        primary: '#E67514',
+        primaryHover: '#c25b02ff'
       }
     },
   },

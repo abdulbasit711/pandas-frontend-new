@@ -56,12 +56,20 @@ const AccountReceivables = () => {
   const fetchReceivables = async () => {
     try {
       const response = await config.getAccountReceivables();
-      if (response.data.length > 0) {
-        const data = response.data
+      // console.log('response', response)
+      if (response) {
+        const data = response.accountReceivables
+        // console.log('data', data)
         setReceivables(data);
 
-        const total = data.reduce(
-          (sum, item) => sum + ((item.bill.totalAmount - item.bill.paidAmount - item.bill.flatDiscount) || 0),
+        const billsWithoutPosted = data.filter(
+          (item) => item.bill.isPosted !== true
+        );
+
+        console.log('billsWithoutPosted', billsWithoutPosted.length)
+
+        const total = billsWithoutPosted.reduce(
+          (sum, item) => sum + ((item?.bill?.totalAmount - item?.bill?.paidAmount - item?.bill?.flatDiscount) || 0),
           0
         );
         setTotalReceivables(total);
@@ -87,6 +95,10 @@ const AccountReceivables = () => {
       minute: '2-digit',
 
     });
+  }
+
+  const viewBill = (billId) => {
+    navigate(`/${primaryPath}/sales/view-bill/${billId}`);
   }
 
 
@@ -160,9 +172,12 @@ const AccountReceivables = () => {
             {paginatedReceivables.filter((receivable) =>
               receivable.bill?.billStatus !== 'paid' && !receivable.bill?.isPosted).map((receivable, index) => (
 
-                // <React.Fragment key={receivable.bill.billNo}>
-                //   </React.Fragment>
-                  <tr key={index} className={`border-t hover:cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
+                <React.Fragment key={receivable.bill.billNo}>
+                  <tr
+                    key={index}
+                    onClick={() => viewBill(receivable.bill.billNo)}
+                    className={`border-t hover:cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}
+                  >
                     <td className="py-2 px-2 text-center">{index + 1}</td>
                     <td className="py-2 px-2 text-center">
                       {receivable.customer.customerName || 'N/A'}
@@ -188,53 +203,57 @@ const AccountReceivables = () => {
                     <td className="py-2 px-2 text-center">
                       {receivable.customer?.customerRegion || 'N/A'}
                     </td>
-                    <td className="py-1 px-2 text-center">
+                    <td className="py-1 px-2 text-center ">
                       <button
-                        className="hover:bg-green-600 border border-green-600 text-green-600 hover:text-white py-1 px-2 rounded-full"
-                        onClick={() => handleBillPayment(receivable.bill.billNo)}
+                        className="hover:bg-green-600 border border-green-600 text-green-600 hover:text-white py-1 px-2 rounded-full "
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBillPayment(receivable.bill.billNo)
+                        }
+                        }
                       >Add Payment</button>
                       <span> </span>
                       <button
                         className="hover:bg-red-600 border border-red-600 text-red-600 hover:text-white py-1 px-2 rounded-full"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setBill(receivable.bill)
                           setIsConfirmationOpen(true)
                         }}
                       >Post</button>
                     </td>
                   </tr>
+                </React.Fragment>
               ))}
           </tbody>
         </table>
       </div>
 
       {totalPages > 1 && (
-              <div className="flex justify-between items-center mt-4 text-sm">
-                <Button
-                  className={`px-4 py-2  rounded-md ${
-                    currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-                  }`}
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
-      
-                <span className="text-gray-700">
-                  Page {currentPage} of {totalPages}
-                </span>
-    
-                <Button
-                  className={`px-4 py-2 rounded-md ${
-                    currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-                  }`}
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
+        <div className="flex justify-between items-center mt-4 text-sm">
+          <Button
+            className={`px-4 py-2  rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
+              }`}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+
+          <span className="text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <Button
+            className={`px-4 py-2 rounded-md ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
+              }`}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
 
       <div className="w-full text-sm flex justify-end mt-3">
         <div className="border p-2 rounded">

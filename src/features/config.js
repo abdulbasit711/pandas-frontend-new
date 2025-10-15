@@ -662,6 +662,7 @@ export class Config {
             }
         } catch (error) {
             console.log("Failed Adding Customer:", error)
+            throw error
         }
     }
 
@@ -796,6 +797,25 @@ export class Config {
             console.log("Failed updating Product:", error)
         }
     }
+   async getReports(params) {
+    console.log(params);
+    try {
+        const response = await this.client.get('/product/get-report', {
+            headers: {
+                Authorization: `Bearer ${authService.getAccessToken()}`,
+                'Content-Type': 'application/json'
+            },
+            params // ✅ this attaches your query params to the request
+        });
+
+        if (response.data) {
+            console.log("config Res: ", response.data);
+            return response.data;
+        }
+    } catch (error) {
+        console.log("Failed getting reports:", error);
+    }
+}
 
     async billPayment({ ...data }) {
         try {
@@ -995,8 +1015,8 @@ export class Config {
                 });
 
             if (response.data) {
-                console.log("all account receivables: ", response.data)
-                return response.data;
+                console.log("all account receivables: ", response.data?.data)
+                return response.data?.data;
             } else {
                 return null;
             }
