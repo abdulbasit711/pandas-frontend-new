@@ -19,7 +19,7 @@ import {
 } from 'recharts';
 import config from '../../../features/config';
 import { useSelector } from 'react-redux';
-import SearchableDropdown from '../../SearchableDropDown';
+import SearchableDropdown from '../../SearchableDropdown';
 
 /*
   ReportsDashboard.jsx
