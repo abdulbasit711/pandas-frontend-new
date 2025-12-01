@@ -19,8 +19,8 @@ export default {
       colors: {
         // primary: '#0c9cdc',
         // primaryHover: '#278eba'
-        primary: '#E67514',
-        primaryHover: '#c25b02ff'
+        primary: '#1C6EA4',
+        primaryHover: '#155178'
       }
     },
   },
