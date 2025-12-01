@@ -11,7 +11,139 @@ import Input from '../../Input';
 import ButtonLoader from '../../ButtonLoader';
 import functions from "../../../features/functions"
 
-const ITEMS_PER_PAGE = 200; // Adjust as needed
+const ITEMS_PER_PAGE = 200;
+
+// --- Dummy Bill Data ---
+const dummyBills = [
+  {
+    _id: "1001",
+    billNo: "BILL-001",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 15,
+    description: "Electronics sale",
+    totalAmount: 45000,
+    paidAmount: 45000,
+    flatDiscount: 0,
+    billRevenue: 45000,
+    billStatus: "paid",
+    isPosted: false,
+    mergedInto: null,
+    customer: { _id: "cust1", customerName: "Ahmed Enterprises" },
+    billType: "thermal"
+  },
+  {
+    _id: "1002",
+    billNo: "BILL-002",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 8,
+    description: "Office supplies",
+    totalAmount: 12500,
+    paidAmount: 6250,
+    flatDiscount: 500,
+    billRevenue: 12500,
+    billStatus: "unpaid",
+    isPosted: false,
+    mergedInto: null,
+    customer: { _id: "cust2", customerName: "Blue Sky Trading" },
+    billType: "A4"
+  },
+  {
+    _id: "1003",
+    billNo: "BILL-003",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 22,
+    description: "Hardware kit",
+    totalAmount: 68000,
+    paidAmount: 68000,
+    flatDiscount: 2000,
+    billRevenue: 68000,
+    billStatus: "paid",
+    isPosted: true,
+    mergedInto: null,
+    customer: { _id: "cust3", customerName: "Tech Solutions Ltd" },
+    billType: "thermal"
+  },
+  {
+    _id: "1004",
+    billNo: "BILL-004",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 12,
+    description: "Bulk order",
+    totalAmount: 35000,
+    paidAmount: 17500,
+    flatDiscount: 1000,
+    billRevenue: 35000,
+    billStatus: "unpaid",
+    isPosted: false,
+    mergedInto: null,
+    customer: { _id: "cust4", customerName: "General Store" },
+    billType: "A4"
+  },
+  {
+    _id: "1005",
+    billNo: "BILL-005",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 30,
+    description: "Wholesale purchase",
+    totalAmount: 95000,
+    paidAmount: 95000,
+    flatDiscount: 5000,
+    billRevenue: 95000,
+    billStatus: "paid",
+    isPosted: false,
+    mergedInto: null,
+    customer: { _id: "cust1", customerName: "Ahmed Enterprises" },
+    billType: "thermal"
+  },
+  {
+    _id: "1006",
+    billNo: "BILL-006",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 5,
+    description: "Special order",
+    totalAmount: 28000,
+    paidAmount: 0,
+    flatDiscount: 0,
+    billRevenue: 28000,
+    billStatus: "unpaid",
+    isPosted: false,
+    mergedInto: null,
+    customer: { _id: "cust2", customerName: "Blue Sky Trading" },
+    billType: "A4"
+  },
+  {
+    _id: "1007",
+    billNo: "BILL-007",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 18,
+    description: "Retail sale",
+    totalAmount: 52000,
+    paidAmount: 52000,
+    flatDiscount: 1500,
+    billRevenue: 52000,
+    billStatus: "paid",
+    isPosted: false,
+    mergedInto: null,
+    customer: { _id: "cust5", customerName: "City Mart" },
+    billType: "thermal"
+  },
+  {
+    _id: "1008",
+    billNo: "BILL-008",
+    createdAt: new Date().toISOString(),
+    totalQuantity: 25,
+    description: "B2B transaction",
+    totalAmount: 78000,
+    paidAmount: 39000,
+    flatDiscount: 2500,
+    billRevenue: 78000,
+    billStatus: "unpaid",
+    isPosted: false,
+    mergedInto: null,
+    customer: { _id: "cust3", customerName: "Tech Solutions Ltd" },
+    billType: "A4"
+  },
+];
 
 function SoldItems() {
   const [totalSales, setTotalSales] = useState(0);
@@ -26,7 +158,6 @@ function SoldItems() {
   const [billId, setBillId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-
   const [filters, setFilters] = useState({
     startDate: new Date().toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
@@ -37,7 +168,6 @@ function SoldItems() {
 
   const { primaryPath } = useSelector((state) => state.auth)
 
-
   const dispatch = useDispatch();
   const customerData = useSelector((state) => state.customers.customerData)
   const {
@@ -47,13 +177,12 @@ function SoldItems() {
   } = useSelector((state) => state.bills);
   const navigate = useNavigate();
 
-
   const inputRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       inputRef.current?.focus();
-    }, 200); // small delay helps after render
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [isLoading]);
@@ -61,41 +190,48 @@ function SoldItems() {
   useEffect(() => {
     fetchAllBills();
   }, []);
-  // console.log("bill data before: ", billData);
 
+  // --- Dummy Data Fetcher (Replaces API call) ---
   const fetchAllBills = async () => {
     try {
-      setIsButtonLoading(true)
+      setIsButtonLoading(true);
+
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const start = new Date(searchBillFilters.startDate);
-      start.setHours(0, 0, 0, 0); // Set to the start of the day
+      start.setHours(0, 0, 0, 0);
       const end = new Date(searchBillFilters.endDate);
-      end.setHours(23, 59, 59, 999); // Set to the end of the day
+      end.setHours(23, 59, 59, 999);
 
-      // const query = new URLSearchParams(searchBillFilters).toString();
-      const query = new URLSearchParams({
-        ...searchBillFilters,
-        startDate: start.toISOString(),
-        endDate: end.toISOString(),
-        billType: searchBillFilters?.billType.join(","),
-        billStatus: searchBillFilters?.billStatus.join(","),
-      }).toString();
+      // Filter dummy bills based on search criteria
+      let filteredBills = dummyBills.filter(bill => {
+        const billDate = new Date(bill.createdAt);
+        const dateInRange = billDate >= start && billDate <= end;
+        
+        const billTypeMatch = searchBillFilters.billType.length === 0 || 
+                             searchBillFilters.billType.includes(bill.billType);
+        
+        const billStatusMatch = searchBillFilters.billStatus.length === 0 || 
+                               searchBillFilters.billStatus.includes(bill.billStatus);
+        
+        const customerMatch = !searchBillFilters.customer || 
+                             bill.customer._id === searchBillFilters.customer;
 
-      const response = await config.fetchAllBills(query);
-      if (response) {
-        dispatch(setBillData(response.data));
-        // console.log("bill data after: ", billData);
-        calculateTotals(response.data);
-      }
+        return dateInRange && billTypeMatch && billStatusMatch && customerMatch;
+      });
+
+      dispatch(setBillData(filteredBills));
+      calculateTotals(filteredBills);
     } catch (error) {
       console.error('Error fetching bills:', error);
     } finally {
       setIsLoading(false);
-      setIsButtonLoading(false)
+      setIsButtonLoading(false);
     }
   };
 
   const calculateTotals = (data) => {
-
     const validBills = data.filter(
       (item) => !item.description?.includes("Merged bill containing")
     );
@@ -135,7 +271,6 @@ function SoldItems() {
       return;
     }
     fetchAllBills();
-    console.log(searchBillFilters)
   };
 
   const handleBillPayment = (billNo) => {
@@ -153,7 +288,6 @@ function SoldItems() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-
     });
   }
 
@@ -171,7 +305,7 @@ function SoldItems() {
     setTotalFlatDiscount(0);
     setRemainingBalance(0);
     setTotalRevenue(0);
-    dispatch(setBillData([])); // clear table data
+    dispatch(setBillData([]));
   };
 
   useEffect(() => {
@@ -180,13 +314,18 @@ function SoldItems() {
     }
   }, [billNo]);
 
+  // --- Dummy Single Bill Fetcher (Replaces API call) ---
   const fetchBill = async (billNo) => {
     try {
-      const response = await config.fetchSingleBill(billNo);
-      if (response && response.data) {
-        console.log('response.data', response.data)
-        dispatch(setBillData([response.data]));
-        calculateTotals([response.data]);
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const foundBill = dummyBills.find(bill => bill.billNo === billNo);
+      if (foundBill) {
+        dispatch(setBillData([foundBill]));
+        calculateTotals([foundBill]);
+      } else {
+        setValidationMessage("Bill not found");
       }
     } catch (error) {
       console.error('Error fetching bill:', error);
@@ -270,7 +409,6 @@ function SoldItems() {
                 <option value=''>Select Customer</option>
                 {customerData && customerData?.map((customer, index) => (
                   <option key={index} value={customer._id}>{customer.customerName}</option>
-
                 ))}
               </select>
             </label>
@@ -282,7 +420,6 @@ function SoldItems() {
             >
               {isButtonLoading ? <ButtonLoader /> : 'Retrieve'}
             </button>
-
           </div>
         </div>
 
@@ -293,7 +430,6 @@ function SoldItems() {
             placeholder="Enter Bill No"
             className="w-72 text-xs p-1"
             value={billNo && billNo || ''}
-            // disabled={bill}
             ref={inputRef}
             onChange={(e) => dispatch(setBillNo(e.target.value))}
           />
@@ -308,7 +444,6 @@ function SoldItems() {
 
         <div className="w-full flex items-end justify-between">
           {<p className="text-red-600 mb-4">{validationMessage}</p>}
-
         </div>
 
         {/* Section 2: Items Table */}
@@ -323,7 +458,6 @@ function SoldItems() {
                 <th className="py-2 px-1 text-left">Total Amount</th>
                 <th className="py-2 px-1 text-left">Bill Balance</th>
                 <th className="py-2 px-1 text-left">Customer Name</th>
-                {/* <th className="py-2 px-1 text-left">Status</th> */}
                 <th className="py-2 px-1 text-left">Actions</th>
                 <th className="py-2 px-1 text-left"></th>
                 <th className="py-2 px-1 text-left"></th>
@@ -332,9 +466,7 @@ function SoldItems() {
             <tbody>
               {paginatedBills.length > 0 ? (
                 paginatedBills.map((bill, index) => (
-                  <tr key={index} className={`border-t hover:cursor-pointer  ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}
-
-                  >
+                  <tr key={index} className={`border-t hover:cursor-pointer  ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
                     <td className="py-2 px-2">{bill.billNo}</td>
                     <td className="py-2 px-2">{getDate(bill.createdAt)}</td>
                     <td className="py-2 px-2">{bill.totalQuantity}</td>
@@ -342,14 +474,6 @@ function SoldItems() {
                     <td className="py-2 px-2">{bill.totalAmount && functions.formatAsianNumber(bill.totalAmount)}</td>
                     <td className="py-2 px-2">{functions.formatAsianNumber(bill.totalAmount - bill.paidAmount - bill.flatDiscount)}</td>
                     <td className="py-2 px-2">{bill.customer?.customerName}</td>
-                    {/* <td className="py-2 px-2">
-                      <span
-                        className={`px-2 py-1 rounded-lg ${bill.isPosted ? 'bg-white text-black' : (bill.billStatus === "paid" ? 'bg-green-600' : 'bg-red-700 text-white')
-                          }`}
-                      >
-                        {bill.isPosted ? "Bill Posted" : (bill.billStatus === "paid" ? 'Paid' : 'Unpaid')}
-                      </span>
-                    </td> */}
                     <td className="py-1 px-2">
                       {bill.isPosted ? <span className='p-2'>Bill Posted</span> : (!(bill.billStatus === "paid") ? (
                         <button
@@ -360,7 +484,6 @@ function SoldItems() {
                         </button>
                       ) : <span className='p-2'>Bill paid</span>)}
                     </td>
-                    {/* button to edit bill */}
                     <td>
                       {bill.isPosted ? <span className=''> Posted</span> : <button
                         className="bg-primary hover:bg-primary/60 duration-200 text-white p-2 rounded"
@@ -478,4 +601,3 @@ function SoldItems() {
 }
 
 export default SoldItems;
-

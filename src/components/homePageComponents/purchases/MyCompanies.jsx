@@ -19,6 +19,97 @@ function MyCompanies() {
   const [isCompanyCreated, setIsCompanyCreated] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
 
+  // Dummy Companies Data
+  const dummyCompaniesData = [
+    {
+      _id: "comp_001",
+      companyName: "Tech Solutions Ltd",
+      mobileNo: "+92-321-1234567",
+      phoneNo: "021-35678901",
+      email: "contact@techsolutions.com",
+      faxNo: "021-35678902",
+      companyRegion: "Karachi",
+      companyDiscount: 5,
+      createdAt: new Date(2024, 0, 10).toISOString(),
+    },
+    {
+      _id: "comp_002",
+      companyName: "Global Traders Inc",
+      mobileNo: "+92-300-2345678",
+      phoneNo: "021-45671234",
+      email: "info@globaltraders.com",
+      faxNo: "021-45671235",
+      companyRegion: "Lahore",
+      companyDiscount: 10,
+      createdAt: new Date(2024, 0, 15).toISOString(),
+    },
+    {
+      _id: "comp_003",
+      companyName: "Prime Industries",
+      mobileNo: "+92-333-3456789",
+      phoneNo: "051-56782345",
+      email: "sales@primeindustries.com",
+      faxNo: "051-56782346",
+      companyRegion: "Islamabad",
+      companyDiscount: 8,
+      createdAt: new Date(2024, 0, 20).toISOString(),
+    },
+    {
+      _id: "comp_004",
+      companyName: "Quality Imports Co",
+      mobileNo: "+92-345-4567890",
+      phoneNo: "021-67893456",
+      email: "admin@qualityimports.com",
+      faxNo: "021-67893457",
+      companyRegion: "Karachi",
+      companyDiscount: 6,
+      createdAt: new Date(2024, 1, 5).toISOString(),
+    },
+    {
+      _id: "comp_005",
+      companyName: "Express Distribution",
+      mobileNo: "+92-334-5678901",
+      phoneNo: "042-78904567",
+      email: "express@distribution.com",
+      faxNo: "042-78904568",
+      companyRegion: "Multan",
+      companyDiscount: 7,
+      createdAt: new Date(2024, 1, 10).toISOString(),
+    },
+    {
+      _id: "comp_006",
+      companyName: "Reliable Suppliers",
+      mobileNo: "+92-315-6789012",
+      phoneNo: "061-89015678",
+      email: "reliable@suppliers.com",
+      faxNo: "061-89015679",
+      companyRegion: "Peshawar",
+      companyDiscount: 4,
+      createdAt: new Date(2024, 1, 15).toISOString(),
+    },
+    {
+      _id: "comp_007",
+      companyName: "National Trading Corp",
+      mobileNo: "+92-322-7890123",
+      phoneNo: "021-90126789",
+      email: "national@trading.com",
+      faxNo: "021-90126790",
+      companyRegion: "Karachi",
+      companyDiscount: 9,
+      createdAt: new Date(2024, 2, 5).toISOString(),
+    },
+    {
+      _id: "comp_008",
+      companyName: "Advanced Logistics",
+      mobileNo: "+92-346-8901234",
+      phoneNo: "031-01237890",
+      email: "advanced@logistics.com",
+      faxNo: "031-01237891",
+      companyRegion: "Hyderabad",
+      companyDiscount: 5,
+      createdAt: new Date(2024, 2, 10).toISOString(),
+    },
+  ];
 
   const {
     register,
@@ -31,12 +122,13 @@ function MyCompanies() {
 
   const fetchCompanies = async () => {
     setError('')
+    setIsLoading(true)
     try {
-      const data = await config.fetchAllCompanies()
-      if (data) {
-        setNewCompanyData(data.data)
-        dispatch(setCompanyData(data.data));
-      }
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      setNewCompanyData(dummyCompaniesData)
+      dispatch(setCompanyData(dummyCompaniesData));
       setIsLoading(false)
     } catch (error) {
       setError(error.message)
@@ -47,11 +139,7 @@ function MyCompanies() {
     setCompanyId(id)
     setIsEdit(true)
     setCompanyName(name)
-    // console.log(id)
   }
-
-
-
 
   const handleUpdateCompany = async (data) => {
     console.log(data);
@@ -67,16 +155,27 @@ function MyCompanies() {
     console.log("Cleaned Data:", cleanedData);
 
     try {
-      const response = await config.updateCompany(cleanedData);
-      if (response) {
-        setSuccessMessage(response.message)
-        console.log("comp res: ", response.message)
-        setIsLoading(false)
-        setIsCompanyCreated(true)
-        reset()
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Find and update the company in dummy data
+      const companyIndex = dummyCompaniesData.findIndex(comp => comp._id === data.companyId);
+      if (companyIndex !== -1) {
+        dummyCompaniesData[companyIndex] = {
+          ...dummyCompaniesData[companyIndex],
+          ...cleanedData,
+        };
       }
+
+      setNewCompanyData([...dummyCompaniesData]);
+      dispatch(setCompanyData([...dummyCompaniesData]));
+      setSuccessMessage("Company updated successfully")
+      setIsLoading(false)
+      setIsCompanyCreated(true)
+      reset()
     } catch (error) {
       console.log("error updating company:", error)
+      setError("Failed to update company")
     }
   };
 
@@ -242,8 +341,6 @@ function MyCompanies() {
         </form>
       </div>
     </div>
-
-
 }
 
 export default MyCompanies

@@ -1,13 +1,65 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import config from '../../../features/config'; // Import your config
-import Button from '../../Button'; // Import your Button component
+import config from '../../../features/config';
+import Button from '../../Button';
 import ErrorResponseMessage from '../../ErrorResponseMessage';
 import SuccessResponseMessage from '../../SuccessResponseMessage';
 import Loader from '../../../pages/Loader';
 import { extractErrorMessage } from '../../../utils/extractErrorMessage';
 
 const VendorJournalEntry = () => {
+    // Dummy Vendor Accounts Data
+    const dummyVendorAccounts = [
+        {
+            _id: "vendor_001",
+            individualAccountName: "Direct Import Co",
+            supplierId: "sup_001",
+            companyId: null,
+        },
+        {
+            _id: "vendor_002",
+            individualAccountName: "Premium Beverages",
+            supplierId: "sup_002",
+            companyId: null,
+        },
+        {
+            _id: "vendor_003",
+            individualAccountName: "Water Suppliers Ltd",
+            supplierId: "sup_003",
+            companyId: null,
+        },
+        {
+            _id: "vendor_004",
+            individualAccountName: "Tech Solutions Ltd",
+            companyId: "comp_001",
+            supplierId: null,
+        },
+        {
+            _id: "vendor_005",
+            individualAccountName: "Global Traders Inc",
+            companyId: "comp_002",
+            supplierId: null,
+        },
+        {
+            _id: "vendor_006",
+            individualAccountName: "Prime Industries",
+            companyId: "comp_003",
+            supplierId: null,
+        },
+        {
+            _id: "vendor_007",
+            individualAccountName: "Quality Imports Co",
+            supplierId: "sup_004",
+            companyId: null,
+        },
+        {
+            _id: "vendor_008",
+            individualAccountName: "Express Distribution",
+            companyId: "comp_004",
+            supplierId: null,
+        },
+    ];
+
     const [vendorAccounts, setVendorAccounts] = useState([]);
     const [formData, setFormData] = useState({
         vendorAccountId: '',
@@ -23,30 +75,13 @@ const VendorJournalEntry = () => {
         const fetchVendorAccounts = async () => {
             try {
                 setLoading(true);
-                const response = await config.getAccounts(); // Your API call
-                if (response.data) {
-                    // Extract Vendor accounts
-                    const extractedVendorAccounts = response.data.filter(account => account.accountName === "Liability");
-                    
-                    if (extractedVendorAccounts.length > 0) {
-                        const accountCategories = extractedVendorAccounts[0].subCategories.filter((subCategory) => subCategory.accountSubCategoryName === "Current Liability");
-                        
-
-                        const accounts = accountCategories[0].individualAccounts.filter((account) => (
-                            account.supplierId ||
-                            account.companyId||
-                            account.supplierId !== null ||
-                            account.companyId !== null
-                        ))
-                        
-
-                        setVendorAccounts(accounts);
-                    } else {
-                        setError("No Vendor Accounts Found");
-                    }
-                } else {
-                    setError("No Vendor Accounts Found");
-                }
+                
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 500))
+                
+                // Use dummy data instead of API call
+                setVendorAccounts(dummyVendorAccounts);
+                
             } catch (err) {
                 console.error("Error fetching vendor accounts:", err);
                 const errorMessage = extractErrorMessage(err);
@@ -70,8 +105,36 @@ const VendorJournalEntry = () => {
         setSuccess(null);
 
         try {
-            const response = await config.postVendorJournalEntry(formData); 
-            if (response) {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            // Validate form data
+            if (!formData.vendorAccountId || !formData.amount) {
+                setError("Vendor Account and Amount are required");
+                setLoading(false);
+                return;
+            }
+
+            // Find the selected vendor account
+            const selectedVendor = dummyVendorAccounts.find(acc => acc._id === formData.vendorAccountId);
+            
+            // Create dummy response object
+            const dummyResponse = {
+                data: {
+                    _id: `vendor_entry_${Date.now()}`,
+                    vendorAccountId: formData.vendorAccountId,
+                    vendorAccountName: selectedVendor?.individualAccountName,
+                    amount: parseFloat(formData.amount),
+                    description: formData.description,
+                    details: formData.details,
+                    createdAt: new Date().toISOString(),
+                    status: "recorded",
+                    debit: parseFloat(formData.amount)
+                },
+                message: "Vendor journal entry recorded successfully!"
+            };
+
+            if (dummyResponse.data) {
                 setSuccess("Vendor journal entry recorded successfully!");
                 setFormData({
                     vendorAccountId: '',
@@ -80,7 +143,7 @@ const VendorJournalEntry = () => {
                     details: '',
                 });
             } else {
-                setError(response.message || "Failed to record vendor journal entry.");
+                setError(dummyResponse.message || "Failed to record vendor journal entry.");
             }
         } catch (err) {
             console.error("Error recording vendor journal entry:", err);

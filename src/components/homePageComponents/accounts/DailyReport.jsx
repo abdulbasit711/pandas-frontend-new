@@ -15,7 +15,7 @@ import { LineChart, Line, BarChart, Bar, PieChart as RPieChart, Pie, Cell, AreaC
 import config from '../../../features/config';
 import { useEffect } from 'react';
 
-// Mock comprehensive data?
+// Comprehensive Mock Data
 const mockData = {
     summary: {
         totalSales: 125000,
@@ -99,7 +99,7 @@ const mockData = {
     ]
 };
 
-// Chart data?
+// Chart data
 const salesTrendData = [
     { time: '9 AM', sales: 5000, revenue: 1500 },
     { time: '11 AM', sales: 8000, revenue: 2400 },
@@ -116,17 +116,19 @@ const DailyReportsUI = () => {
     const [activeView, setActiveView] = useState('overview');
     const [selectedDetail, setSelectedDetail] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [data, setData] = useState(null);
-
-    //   const data? = mockData;
+    const [data, setData] = useState(mockData);
 
     const getReports = async () => {
         try {
-            const res = await config.getDailyReports(dateRange);
-            console.log('res', res)
-            if (res.data) setData(res.data)
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            // Use dummy data instead of API call
+            setData(mockData);
+            console.log('Using dummy daily report data')
         } catch (error) {
             console.log('error', error)
+            setData(mockData);
         }
     }
 
@@ -167,7 +169,6 @@ const DailyReportsUI = () => {
                             {change !== undefined && (
                                 <div className={`flex items-center space-x-1 px-3 py-1 rounded-full ${isPositive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                                     {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                                    {/* <span className="text-sm font-bold">{Math.abs(change)}%</span> */}
                                 </div>
                             )}
                         </div>
@@ -419,23 +420,6 @@ const DailyReportsUI = () => {
                                 <RefreshCw className="w-5 h-5 mr-2" />
                                 Refresh
                             </button>
-
-                            {/* <button className="flex items-center px-6 py-3 bg-white border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-all shadow-lg">
-                <Download className="w-5 h-5 mr-2" />
-                Export
-              </button> */}
-
-                            {/* <button 
-                onClick={() => setComparisonMode(!comparisonMode)}
-                className={`flex items-center px-6 py-3 rounded-xl transition-all shadow-lg ${
-                  comparisonMode 
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white' 
-                    : 'bg-white border-2 border-green-600 text-green-600 hover:bg-green-50'
-                }`}
-              >
-                <TrendingUpDown className="w-5 h-5 mr-2" />
-                Compare
-              </button> */}
                         </div>
                     </div>
 
@@ -453,30 +437,6 @@ const DailyReportsUI = () => {
                                 />
                             </div>
                         </div>
-
-                        {/* <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <Calendar className="w-5 h-5 text-blue-600" />
-              <div className="flex-1">
-                <label className="text-xs text-gray-600 block mb-1">To Date</label>
-                <input
-                  type="date"
-                  value={dateRange.endDate}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-                  className="w-full bg-transparent border-none focus:outline-none font-semibold text-gray-900"
-                />
-              </div>
-            </div> */}
-
-                        {/* <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search in reports..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div> */}
                     </div>
                 </div>
             </div>
@@ -487,7 +447,6 @@ const DailyReportsUI = () => {
                     icon={DollarSign}
                     title="Total Sales"
                     value={data?.summary.totalSales}
-                    //   change={comparisonMode ? calculateChange(data?.summary.totalSales, data?.comparison.previousPeriod.totalSales) : undefined}
                     subtitle={comparisonMode ? `Previous: PKR ${data?.comparison.previousPeriod.totalSales?.toLocaleString()}` : undefined}
                     color="bg-emerald-500"
                     delay={0}
@@ -496,7 +455,6 @@ const DailyReportsUI = () => {
                     icon={TrendingUp}
                     title="Total Revenue"
                     value={data?.summary.totalRevenue}
-                    //   change={comparisonMode ? calculateChange(data?.summary.totalRevenue, data?.comparison.previousPeriod.totalRevenue) : undefined}
                     subtitle={comparisonMode ? `Previous: PKR ${data?.comparison.previousPeriod.totalRevenue?.toLocaleString()}` : undefined}
                     color="bg-blue-500"
                     delay={0.1}
@@ -505,7 +463,6 @@ const DailyReportsUI = () => {
                     icon={ShoppingCart}
                     title="Total Purchases"
                     value={data?.summary.totalPurchases}
-                    //   change={comparisonMode ? calculateChange(data?.summary.totalPurchases, data?.comparison.previousPeriod.totalPurchases) : undefined}
                     subtitle={comparisonMode ? `Previous: PKR ${data?.comparison.previousPeriod.totalPurchases?.toLocaleString()}` : undefined}
                     color="bg-purple-500"
                     delay={0.2}

@@ -6,6 +6,75 @@ import config from '../../../features/config';
 import { extractErrorMessage } from '../../../utils/extractErrorMessage';
 import Loader from '../../../pages/Loader';
 
+// Dummy data for accounts hierarchy
+const dummyAccountsHierarchy = [
+  {
+    _id: 'acc_001',
+    accountName: 'Assets',
+    subCategories: [
+      {
+        _id: 'sub_001',
+        accountSubCategoryName: 'Current Assets',
+        individualAccounts: [
+          { _id: 'ind_001', individualAccountName: 'Cash in Hand', accountBalance: 150000 },
+          { _id: 'ind_002', individualAccountName: 'Bank Account - Primary', accountBalance: 500000 },
+          { _id: 'ind_003', individualAccountName: 'Bank Account - Secondary', accountBalance: 250000 },
+          { _id: 'ind_004', individualAccountName: 'Accounts Receivable', accountBalance: 200000 },
+        ]
+      },
+      {
+        _id: 'sub_002',
+        accountSubCategoryName: 'Fixed Assets',
+        individualAccounts: [
+          { _id: 'ind_005', individualAccountName: 'Building', accountBalance: 1000000 },
+          { _id: 'ind_006', individualAccountName: 'Building - Annex', accountBalance: 500000 },
+          { _id: 'ind_007', individualAccountName: 'Equipment', accountBalance: 300000 },
+          { _id: 'ind_008', individualAccountName: 'Furniture', accountBalance: 80000 },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_002',
+    accountName: 'Liabilities',
+    subCategories: [
+      {
+        _id: 'sub_003',
+        accountSubCategoryName: 'Current Liabilities',
+        individualAccounts: [
+          { _id: 'ind_009', individualAccountName: 'Accounts Payable', accountBalance: 100000 },
+          { _id: 'ind_010', individualAccountName: 'Accounts Payable - Supplier 2', accountBalance: 75000 },
+          { _id: 'ind_011', individualAccountName: 'Short-term Loan', accountBalance: 50000 },
+          { _id: 'ind_012', individualAccountName: 'Interest Payable', accountBalance: 15000 },
+        ]
+      },
+      {
+        _id: 'sub_004',
+        accountSubCategoryName: 'Long-term Liabilities',
+        individualAccounts: [
+          { _id: 'ind_013', individualAccountName: 'Long-term Loan', accountBalance: 500000 },
+          { _id: 'ind_014', individualAccountName: 'Mortgage Payable', accountBalance: 750000 },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_003',
+    accountName: 'Equity',
+    subCategories: [
+      {
+        _id: 'sub_005',
+        accountSubCategoryName: 'Capital',
+        individualAccounts: [
+          { _id: 'ind_015', individualAccountName: 'Paid-up Capital', accountBalance: 1000000 },
+          { _id: 'ind_016', individualAccountName: 'Retained Earnings', accountBalance: 350000 },
+          { _id: 'ind_017', individualAccountName: 'Owner Drawing', accountBalance: -50000 },
+        ]
+      }
+    ]
+  }
+];
+
 const MergeAccounts = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [submitError, setSubmitError] = useState('');
@@ -22,20 +91,20 @@ const MergeAccounts = () => {
         const fetchAccounts = async () => {
             try {
                 setIsLoading(true);
-                const response = await config.getAccounts();
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Use dummy data instead of API call
+                const accountsData = dummyAccountsHierarchy;
+                setAccounts(accountsData);
         
-                if (response) {
-                    const accountsData = response.data;
-                    setAccounts(accountsData);
+                const allSubCategories = accountsData.flatMap((account) => account.subCategories || []);
+                setSubCategories(allSubCategories);
         
-                    const allSubCategories = accountsData.flatMap((account) => account.subCategories || []);
-                    setSubCategories(allSubCategories);
-        
-                    const allIndividualAccounts = allSubCategories.flatMap(
-                        (subCategory) => subCategory.individualAccounts || []
-                    );
-                    setIndividualAccounts(allIndividualAccounts);
-                }
+                const allIndividualAccounts = allSubCategories.flatMap(
+                    (subCategory) => subCategory.individualAccounts || []
+                );
+                setIndividualAccounts(allIndividualAccounts);
             } catch (error) {
                 console.error("Failed fetching accounts: ", error);
             } finally {
@@ -52,21 +121,42 @@ const MergeAccounts = () => {
         setSubmitSuccess(false);
 
         try {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+
             const payload = {
                 childAccountIds,
                 ...(mergeOption === 'new' ? { parentAccountName } : { existingParentAccountId })
             };
 
-            const response = await config.mergeAccounts(payload);
-            if (response) {
+            // Create dummy response
+            const dummyResponse = {
+                data: {
+                    _id: `merged_${Date.now()}`,
+                    message: 'Accounts merged successfully',
+                    mergedAt: new Date().toISOString(),
+                    parentAccountId: mergeOption === 'new' ? `new_acc_${Date.now()}` : existingParentAccountId,
+                    childAccountIds: childAccountIds,
+                    mergeType: mergeOption
+                }
+            };
+
+            if (dummyResponse) {
+                // Remove merged child accounts from the list
+                setIndividualAccounts(
+                    individualAccounts.filter(acc => !childAccountIds.includes(acc._id))
+                );
+
                 setParentAccountName('');
                 setExistingParentAccountId('');
+                setSubmitSuccess(true);
+                setChildAccountIds([]);
+                
+                // Clear success message after 3 seconds
+                setTimeout(() => setSubmitSuccess(false), 3000);
             }
-
-            setSubmitSuccess(true);
-            setChildAccountIds([]);
         } catch (err) {
-            setSubmitError(extractErrorMessage(err));
+            setSubmitError(extractErrorMessage(err) || 'Failed to merge accounts');
         } finally {
             setIsLoading(false);
         }

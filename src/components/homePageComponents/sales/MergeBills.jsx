@@ -7,7 +7,118 @@ import Button from '../../Button';
 import config from '../../../features/config';
 import { extractErrorMessage } from '../../../utils/extractErrorMessage';
 import Loader from '../../../pages/Loader';
-// import Pagination from './../Pagination'; // Assuming you have a Pagination component
+
+// --- Dummy Bills Data ---
+const dummyBillsData = [
+  {
+    _id: "bill_001",
+    billNo: "BILL-0001",
+    customer: { _id: "cust1", customerName: "Ahmed Enterprises", name: "Ahmed Enterprises" },
+    totalAmount: 45000,
+    billStatus: "unpaid",
+    mergedInto: null,
+    billType: "thermal"
+  },
+  {
+    _id: "bill_002",
+    billNo: "BILL-0002",
+    customer: { _id: "cust2", customerName: "Blue Sky Trading", name: "Blue Sky Trading" },
+    totalAmount: 12500,
+    billStatus: "unpaid",
+    mergedInto: null,
+    billType: "A4"
+  },
+  {
+    _id: "bill_003",
+    billNo: "BILL-0003",
+    customer: { _id: "cust3", customerName: "Tech Solutions Ltd", name: "Tech Solutions Ltd" },
+    totalAmount: 68000,
+    billStatus: "paid",
+    mergedInto: null,
+    billType: "thermal"
+  },
+  {
+    _id: "bill_004",
+    billNo: "BILL-0004",
+    customer: { _id: "cust4", customerName: "General Store", name: "General Store" },
+    totalAmount: 35000,
+    billStatus: "unpaid",
+    mergedInto: null,
+    billType: "A4"
+  },
+  {
+    _id: "bill_005",
+    billNo: "BILL-0005",
+    customer: { _id: "cust1", customerName: "Ahmed Enterprises", name: "Ahmed Enterprises" },
+    totalAmount: 95000,
+    billStatus: "paid",
+    mergedInto: null,
+    billType: "thermal"
+  },
+  {
+    _id: "bill_006",
+    billNo: "BILL-0006",
+    customer: { _id: "cust2", customerName: "Blue Sky Trading", name: "Blue Sky Trading" },
+    totalAmount: 28000,
+    billStatus: "unpaid",
+    mergedInto: null,
+    billType: "A4"
+  },
+  {
+    _id: "bill_007",
+    billNo: "BILL-0007",
+    customer: { _id: "cust5", customerName: "City Mart", name: "City Mart" },
+    totalAmount: 52000,
+    billStatus: "paid",
+    mergedInto: null,
+    billType: "thermal"
+  },
+  {
+    _id: "bill_008",
+    billNo: "BILL-0008",
+    customer: { _id: "cust3", customerName: "Tech Solutions Ltd", name: "Tech Solutions Ltd" },
+    totalAmount: 78000,
+    billStatus: "unpaid",
+    mergedInto: null,
+    billType: "A4"
+  },
+  {
+    _id: "bill_009",
+    billNo: "BILL-0009",
+    customer: { _id: "cust4", customerName: "General Store", name: "General Store" },
+    totalAmount: 42000,
+    billStatus: "paid",
+    mergedInto: null,
+    billType: "thermal"
+  },
+  {
+    _id: "bill_010",
+    billNo: "BILL-0010",
+    customer: { _id: "cust1", customerName: "Ahmed Enterprises", name: "Ahmed Enterprises" },
+    totalAmount: 65000,
+    billStatus: "unpaid",
+    mergedInto: null,
+    billType: "A4"
+  },
+  {
+    _id: "bill_011",
+    billNo: "BILL-0011",
+    customer: { _id: "cust5", customerName: "City Mart", name: "City Mart" },
+    totalAmount: 58000,
+    billStatus: "unpaid",
+    mergedInto: null,
+    billType: "thermal"
+  },
+  {
+    _id: "bill_012",
+    billNo: "BILL-0012",
+    customer: { _id: "cust6", customerName: "Premium Supplies", name: "Premium Supplies" },
+    totalAmount: 88000,
+    billStatus: "paid",
+    mergedInto: null,
+    billType: "A4"
+  },
+];
 
 const MergeBills = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -23,18 +134,20 @@ const MergeBills = () => {
     const billsPerPage = 50;
 
     const [parentBillCurrentPage, setParentBillCurrentPage] = useState(1);
-    const [parentBillPerPage] = useState(50); // Show 50 bills per page in dropdown
+    const [parentBillPerPage] = useState(50);
     const [parentBillSearchTerm, setParentBillSearchTerm] = useState('');
 
     useEffect(() => {
         const fetchBills = async () => {
             try {
                 setIsLoading(true);
-                const response = await config.fetchAllBills();
-                if (response) {
-                    // Filter out bills that are already merged
-                    setBills(response.data.filter(bill => !bill.mergedInto));
-                }
+                
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Filter out merged bills from dummy data
+                const unmergedBills = dummyBillsData.filter(bill => !bill.mergedInto);
+                setBills(unmergedBills);
             } catch (error) {
                 console.error("Failed fetching bills: ", error);
             } finally {
@@ -70,28 +183,44 @@ const MergeBills = () => {
     const currentBills = filteredBills.slice(indexOfFirstBill, indexOfLastBill);
     const totalPages = Math.ceil(filteredBills.length / billsPerPage);
 
+    // --- Dummy Merge Handler (Replaces API call) ---
     const handleSubmit = async () => {
         setIsLoading(true);
         setSubmitError('');
         setSubmitSuccess(false);
 
         try {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+
             const payload = {
                 childBillIds,
                 ...(mergeOption === 'existing' ? { parentBillId } : {})
             };
 
-            const response = await config.mergeBills(payload);
-            if (response) {
-                setParentBillId('');
-                setSubmitSuccess(true);
-                setChildBillIds([]);
-                // Refresh bills after successful merge
-                const refreshedBills = await config.fetchAllBills();
-                setBills(refreshedBills.data.filter(bill => !bill.mergedInto));
-            }
+            // Simulate merge operation - mark child bills as merged
+            const updatedBills = bills.map(bill => {
+                if (childBillIds.includes(bill._id)) {
+                    return {
+                        ...bill,
+                        mergedInto: mergeOption === 'existing' ? parentBillId : 'new_parent_bill'
+                    };
+                }
+                return bill;
+            });
+
+            // Filter out merged bills
+            setBills(updatedBills.filter(bill => !bill.mergedInto));
+            
+            setParentBillId('');
+            setSubmitSuccess(true);
+            setChildBillIds([]);
+            setChildBillNos([]);
+            
+            // Clear success message after 3 seconds
+            setTimeout(() => setSubmitSuccess(false), 3000);
         } catch (err) {
-            setSubmitError(extractErrorMessage(err));
+            setSubmitError(extractErrorMessage(err) || "Error merging bills");
         } finally {
             setIsLoading(false);
         }
@@ -146,17 +275,6 @@ const MergeBills = () => {
                             />
                             Create New Parent Bill
                         </label>
-                        {/* <label className="flex items-center">
-                            <input
-                                type="radio"
-                                name="mergeOption"
-                                value="existing"
-                                checked={mergeOption === 'existing'}
-                                onChange={() => setMergeOption('existing')}
-                                className="mr-2"
-                            />
-                            Use Existing Parent Bill
-                        </label> */}
                     </div>
 
                     {mergeOption === 'existing' && (
@@ -172,7 +290,7 @@ const MergeBills = () => {
                                 value={parentBillSearchTerm}
                                 onChange={(e) => {
                                     setParentBillSearchTerm(e.target.value);
-                                    setParentBillCurrentPage(1); // Reset to first page when searching
+                                    setParentBillCurrentPage(1);
                                 }}
                                 className="w-full p-2 border rounded mb-2"
                             />
@@ -236,12 +354,11 @@ const MergeBills = () => {
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
-                            setCurrentPage(1); // Reset to first page when searching
+                            setCurrentPage(1);
                         }}
                         className="w-full p-2 border rounded"
                     />
                 </div>
-
 
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">

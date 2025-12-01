@@ -24,6 +24,57 @@ const AddItemCategory = () => {
 
     const categoryData = useSelector((state) => state.categories.categoryData);
 
+    // Dummy Categories Data
+    const dummyCategoriesData = [
+        {
+            _id: "cat_001",
+            categoryName: "Electronics",
+            categoryDescription: "Electronic devices and gadgets",
+            createdAt: new Date(2024, 0, 10).toISOString(),
+        },
+        {
+            _id: "cat_002",
+            categoryName: "Clothing",
+            categoryDescription: "Apparel and fashion items",
+            createdAt: new Date(2024, 0, 15).toISOString(),
+        },
+        {
+            _id: "cat_003",
+            categoryName: "Food & Beverages",
+            categoryDescription: "Food products and drinks",
+            createdAt: new Date(2024, 0, 20).toISOString(),
+        },
+        {
+            _id: "cat_004",
+            categoryName: "Office Supplies",
+            categoryDescription: "Stationery and office equipment",
+            createdAt: new Date(2024, 1, 5).toISOString(),
+        },
+        {
+            _id: "cat_005",
+            categoryName: "Hardware",
+            categoryDescription: "Tools and hardware items",
+            createdAt: new Date(2024, 1, 10).toISOString(),
+        },
+        {
+            _id: "cat_006",
+            categoryName: "Furniture",
+            categoryDescription: "Furniture and home furnishings",
+            createdAt: new Date(2024, 1, 15).toISOString(),
+        },
+        {
+            _id: "cat_007",
+            categoryName: "Cosmetics",
+            categoryDescription: "Beauty and personal care products",
+            createdAt: new Date(2024, 2, 5).toISOString(),
+        },
+        {
+            _id: "cat_008",
+            categoryName: "Machinery",
+            categoryDescription: "Industrial machinery and equipment",
+            createdAt: new Date(2024, 2, 10).toISOString(),
+        },
+    ];
 
     const {
         register,
@@ -35,11 +86,10 @@ const AddItemCategory = () => {
     const fetchCategories = async () => {
         setIsLoading(true);
         try {
-            const response = await config.fetchAllCategories();
-            if (response.data) {
-                dispatch(setCategoryData(response.data));
-                // setIsLoading(false)
-            }
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            dispatch(setCategoryData(dummyCategoriesData));
         } catch (error) {
             console.log("fetching categories Failed: ", error)
         } finally {
@@ -63,13 +113,21 @@ const AddItemCategory = () => {
         console.log("Cleaned Data:", cleanedData);
 
         try {
-            const response = await config.createCategory(cleanedData);
-            if (response) {
-                setSuccessMessage(response.message)
-                console.log("comp res: ", response.message)
-                setIsCategoryCreated(true)
-                reset()
-            }
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            // Create new category in dummy data
+            const newCategory = {
+                _id: `cat_${Date.now()}`,
+                ...cleanedData,
+                createdAt: new Date().toISOString(),
+            };
+            dummyCategoriesData.push(newCategory);
+
+            dispatch(setCategoryData([...dummyCategoriesData]));
+            setSuccessMessage("Category added successfully")
+            setIsCategoryCreated(true)
+            reset()
         } catch (error) {
             console.log("error adding Category:", error)
             setError(error.message)
@@ -100,13 +158,22 @@ const AddItemCategory = () => {
         console.log("Cleaned Data:", cleanedData);
 
         try {
-            const response = await config.updateCategory(cleanedData);
-            if (response) {
-                setSuccessMessage(response.message)
-                console.log("comp res: ", response.message)
-                setIsEdit(false)
-                reset()
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            // Find and update the category in dummy data
+            const categoryIndex = dummyCategoriesData.findIndex(cat => cat._id === data.categoryId);
+            if (categoryIndex !== -1) {
+                dummyCategoriesData[categoryIndex] = {
+                    ...dummyCategoriesData[categoryIndex],
+                    ...cleanedData,
+                };
             }
+
+            dispatch(setCategoryData([...dummyCategoriesData]));
+            setSuccessMessage("Category updated successfully")
+            setIsEdit(false)
+            reset()
         } catch (error) {
             console.log("error updating category:", error)
         } finally {

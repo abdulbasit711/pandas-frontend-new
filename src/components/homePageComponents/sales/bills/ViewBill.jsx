@@ -3,7 +3,7 @@ import React from 'react';
 import Logo from '../../../Logo';
 import commonFunction from '../../../../features/functions';
 import billLogo from '../../../../assets/billLogo.png'
-import paymentQR from '../../../../assets/paymentQR.jpg'
+import paymentQR from '../../../../assets/image.png'
 // import { useSelector } from 'react-redux';
 
 // ViewBill component wrapped in forwardRef
@@ -30,7 +30,7 @@ const ViewBill = React.forwardRef((props, ref) => {
                     <div className='text-center w-full'>
                         <div className='flex pl-4'>
                             
-                            <div className='flex items-end justify-center '>
+                            <div className='flex items-end justify-center font-extrabold text-2xl'>
                                 {/* <span className='text-4xl font-extrabold pb-2 pr-2'>PARKO </span> <h2 className="text-xl font-bold pb-2"> ELECTRIC AND ELECTRONICS</h2>
                                 <span className='text-xs pb-6 pl-2'>RTM 294967</span> */}
                                 {bill?.BusinessId?.businessName}

@@ -1,4 +1,3 @@
-
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -25,6 +24,57 @@ const AddItemType = () => {
 
     const dispatch = useDispatch()
 
+    // Dummy Types Data
+    const dummyTypesData = [
+        {
+            _id: "type_001",
+            typeName: "Retail",
+            typeDescription: "Standard retail products",
+            createdAt: new Date(2024, 0, 10).toISOString(),
+        },
+        {
+            _id: "type_002",
+            typeName: "Wholesale",
+            typeDescription: "Bulk wholesale items",
+            createdAt: new Date(2024, 0, 15).toISOString(),
+        },
+        {
+            _id: "type_003",
+            typeName: "Premium",
+            typeDescription: "High-end premium products",
+            createdAt: new Date(2024, 0, 20).toISOString(),
+        },
+        {
+            _id: "type_004",
+            typeName: "Economy",
+            typeDescription: "Budget-friendly items",
+            createdAt: new Date(2024, 1, 5).toISOString(),
+        },
+        {
+            _id: "type_005",
+            typeName: "Corporate",
+            typeDescription: "Corporate and bulk orders",
+            createdAt: new Date(2024, 1, 10).toISOString(),
+        },
+        {
+            _id: "type_006",
+            typeName: "Seasonal",
+            typeDescription: "Seasonal and limited edition",
+            createdAt: new Date(2024, 1, 15).toISOString(),
+        },
+        {
+            _id: "type_007",
+            typeName: "Import",
+            typeDescription: "Imported goods",
+            createdAt: new Date(2024, 2, 5).toISOString(),
+        },
+        {
+            _id: "type_008",
+            typeName: "Domestic",
+            typeDescription: "Locally manufactured items",
+            createdAt: new Date(2024, 2, 10).toISOString(),
+        },
+    ];
 
     const {
         register,
@@ -36,11 +86,10 @@ const AddItemType = () => {
     const fetchTypes = async () => {
         setIsLoading(true);
         try {
-            const response = await config.fetchAllTypes();
-            if (response.data) {
-                dispatch(setTypeData(response.data));
-                // setIsLoading(false)
-            }
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            dispatch(setTypeData(dummyTypesData));
         } catch (error) {
             console.log("fetching types Failed: ", error)
         } finally {
@@ -63,14 +112,21 @@ const AddItemType = () => {
         console.log("Cleaned Data:", cleanedData);
 
         try {
-            const response = await config.createType(cleanedData);
-            if (response) {
-                setSuccessMessage(response.message)
-                console.log("comp res: ", response.message)
-                fetchTypes()
-                setIsTypeCreated(true)
-                reset()
-            }
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            // Create new type in dummy data
+            const newType = {
+                _id: `type_${Date.now()}`,
+                ...cleanedData,
+                createdAt: new Date().toISOString(),
+            };
+            dummyTypesData.push(newType);
+
+            dispatch(setTypeData([...dummyTypesData]));
+            setSuccessMessage("Type added successfully")
+            setIsTypeCreated(true)
+            reset()
         } catch (error) {
             console.log("error adding Type:", error)
             setError(error.message)
@@ -103,13 +159,22 @@ const AddItemType = () => {
         console.log("Cleaned Data:", cleanedData);
 
         try {
-            const response = await config.updateType(cleanedData);
-            if (response) {
-                setSuccessMessage(response.message)
-                console.log("comp res: ", response.message)
-                setIsEdit(false)
-                reset()
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            // Find and update the type in dummy data
+            const typeIndex = dummyTypesData.findIndex(type => type._id === data.typeId);
+            if (typeIndex !== -1) {
+                dummyTypesData[typeIndex] = {
+                    ...dummyTypesData[typeIndex],
+                    ...cleanedData,
+                };
             }
+
+            dispatch(setTypeData([...dummyTypesData]));
+            setSuccessMessage("Type updated successfully")
+            setIsEdit(false)
+            reset()
         } catch (error) {
             console.log("error updating Category:", error)
         } finally {

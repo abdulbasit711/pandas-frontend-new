@@ -1,5 +1,3 @@
-
-
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,12 +14,131 @@ import {
   clearPurchaseState,
   setTotalAmount,
   setVendor,
-  setSelectedItems, // New: Set selected items in store
+  setSelectedItems,
 } from "../../../store/slices/purchase/purchaseItemSlice";
 import { setAllProducts } from "../../../store/slices/products/productsSlice"
 import Input from "../../Input";
 import Button from "../../Button";
 import Loader from "../../../pages/Loader";
+
+// --- Dummy Data ---
+const dummyCompanies = [
+  { _id: "comp_001", companyName: "TechCorp Supply" },
+  { _id: "comp_002", companyName: "Global Traders Ltd" },
+  { _id: "comp_003", companyName: "Premium Electronics" },
+];
+
+const dummySuppliers = [
+  { _id: "sup_001", supplierName: "Direct Import Co" },
+  { _id: "sup_002", supplierName: "Wholesale Hub" },
+  { _id: "sup_003", supplierName: "Bulk Suppliers Inc" },
+];
+
+const dummyCategories = [
+  { _id: "cat_001", categoryName: "Electronics" },
+  { _id: "cat_002", categoryName: "Accessories" },
+  { _id: "cat_003", categoryName: "Software" },
+];
+
+const dummyTypes = [
+  { _id: "type_001", typeName: "Computers" },
+  { _id: "type_002", typeName: "Peripherals" },
+  { _id: "type_003", typeName: "Licenses" },
+];
+
+const dummyProducts = [
+  {
+    _id: "prod_001",
+    productName: "Laptop Pro 15",
+    productCode: "LP-001",
+    productPurchasePrice: 80000,
+    productPack: 1,
+    productTotalQuantity: 50,
+    vendorCompanyDetails: [{ _id: "comp_001" }],
+    vendorSupplierDetails: [],
+    salePriceDetails: [{ salePrice1: 150000 }],
+    quantityUnit: "pcs",
+    packUnit: "box"
+  },
+  {
+    _id: "prod_002",
+    productName: "USB-C Cable",
+    productCode: "USB-C",
+    productPurchasePrice: 400,
+    productPack: 10,
+    productTotalQuantity: 500,
+    vendorCompanyDetails: [{ _id: "comp_001" }],
+    vendorSupplierDetails: [],
+    salePriceDetails: [{ salePrice1: 800 }],
+    quantityUnit: "pcs",
+    packUnit: "pcs"
+  },
+  {
+    _id: "prod_003",
+    productName: "Wireless Mouse",
+    productCode: "WM-001",
+    productPurchasePrice: 1500,
+    productPack: 1,
+    productTotalQuantity: 200,
+    vendorCompanyDetails: [{ _id: "comp_002" }],
+    vendorSupplierDetails: [],
+    salePriceDetails: [{ salePrice1: 2500 }],
+    quantityUnit: "pcs",
+    packUnit: "pcs"
+  },
+  {
+    _id: "prod_004",
+    productName: "Mechanical Keyboard",
+    productCode: "KB-001",
+    productPurchasePrice: 3000,
+    productPack: 1,
+    productTotalQuantity: 100,
+    vendorCompanyDetails: [],
+    vendorSupplierDetails: [{ _id: "sup_001" }],
+    salePriceDetails: [{ salePrice1: 5500 }],
+    quantityUnit: "pcs",
+    packUnit: "box"
+  },
+  {
+    _id: "prod_005",
+    productName: "4K Monitor",
+    productCode: "MON-001",
+    productPurchasePrice: 25000,
+    productPack: 1,
+    productTotalQuantity: 30,
+    vendorCompanyDetails: [{ _id: "comp_003" }],
+    vendorSupplierDetails: [],
+    salePriceDetails: [{ salePrice1: 45000 }],
+    quantityUnit: "pcs",
+    packUnit: "box"
+  },
+  {
+    _id: "prod_006",
+    productName: "HDMI Cable",
+    productCode: "HDMI-001",
+    productPurchasePrice: 300,
+    productPack: 5,
+    productTotalQuantity: 1000,
+    vendorCompanyDetails: [],
+    vendorSupplierDetails: [{ _id: "sup_002" }],
+    salePriceDetails: [{ salePrice1: 600 }],
+    quantityUnit: "pcs",
+    packUnit: "pcs"
+  },
+  {
+    _id: "prod_007",
+    productName: "Power Bank 20000mAh",
+    productCode: "PB-001",
+    productPurchasePrice: 2000,
+    productPack: 1,
+    productTotalQuantity: 150,
+    vendorCompanyDetails: [{ _id: "comp_002" }],
+    vendorSupplierDetails: [],
+    salePriceDetails: [{ salePrice1: 3500 }],
+    quantityUnit: "pcs",
+    packUnit: "box"
+  },
+];
 
 const PurchaseItem = () => {
   const dispatch = useDispatch();
@@ -70,12 +187,11 @@ const PurchaseItem = () => {
     vendorProducts,
   } = useSelector((state) => state.purchaseItem);
 
-
   const { allProducts } = useSelector((state) => state.saleItems);
-  const companyData = useSelector((state) => state.companies.companyData);
-  const supplierData = useSelector((state) => state.suppliers.supplierData);
-  const categoryData = useSelector((state) => state.categories.categoryData);
-  const typeData = useSelector((state) => state.types.typeData);
+  const companyData = useSelector((state) => state.companies.companyData) || dummyCompanies;
+  const supplierData = useSelector((state) => state.suppliers.supplierData) || dummySuppliers;
+  const categoryData = useSelector((state) => state.categories.categoryData) || dummyCategories;
+  const typeData = useSelector((state) => state.types.typeData) || dummyTypes;
 
   const inputRef = useRef(null);
 
@@ -85,7 +201,7 @@ const PurchaseItem = () => {
 
   useEffect(() => {
     if (searchQuery) {
-      const results = allProducts.filter(
+      const results = dummyProducts.filter(
         (product) =>
           (product.vendorCompanyDetails[0]?._id === vendor ||
             product.vendorSupplierDetails[0]?._id === vendor) &&
@@ -96,10 +212,11 @@ const PurchaseItem = () => {
     } else {
       dispatch(setSearchQueryProducts([]));
     }
-  }, [searchQuery, allProducts, dispatch, vendor]);
+  }, [searchQuery, vendor, dispatch]);
 
+  // --- Dummy Generate Bill Handler (Replaces API call) ---
   const handleGenerateBill = async () => {
-    if (!vendor || !selectedItems) {
+    if (!vendor || !selectedItems || selectedItems.length === 0) {
       alert("Please fill all the required fields.");
       return;
     }
@@ -111,6 +228,9 @@ const PurchaseItem = () => {
     if (userConfirmed) {
       setIsLoading(true)
       try {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         const billItems = selectedItems.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -120,42 +240,29 @@ const PurchaseItem = () => {
         }))
         console.log("billItems", billItems)
 
-        const isVendorCompany = companyData.find((company) => company._id === vendor);
-        const isVendorSupplier = supplierData.find((supplier) => supplier._id === vendor);
+        const isVendorCompany = dummyCompanies.find((company) => company._id === vendor);
+        const isVendorSupplier = dummySuppliers.find((supplier) => supplier._id === vendor);
 
-        const response = await config.createPurchase({
-          billNo,
-          vendorSupplierId: isVendorSupplier ? vendor : null,
-          vendorCompanyId: isVendorCompany ? vendor : null,
-          purchaseItems: billItems,
-          flatDiscount: flatDiscount || 0,
-          purchaseDate: date,
-          paidAmount,
-        });
+        // Simulate successful purchase creation
+        const response = {
+          data: {
+            purchaseId: `PUR-${Date.now()}`,
+            billNo: billNo,
+            vendor: isVendorCompany ? isVendorCompany.companyName : isVendorSupplier?.supplierName,
+            items: billItems,
+            totalAmount: totalAmount,
+            createdAt: new Date().toISOString()
+          }
+        };
 
-        if (response && response.data) {
-          console.log("response: ", response.data);
-          dispatch(clearPurchaseState())
-        }
-
-        // setIsInvoiceGenerated(true);
-
+        console.log("response: ", response.data);
+        alert("Purchase invoice generated successfully!");
+        dispatch(clearPurchaseState());
+        setError("");
       } catch (error) {
-        const htmlString = error.response?.data;
-
-        // Parse the HTML string into a DOM object
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, 'text/html');
-
-        const preContent = doc.querySelector('pre').innerHTML.replace(/<br\s*\/?>/gi, '\n');
-
-        // Extract only the first line (the error message)
-        const errorMessage = preContent.split('\n')[0]; // Get the first line
-
-        setError(errorMessage)
+        setError("Error generating purchase invoice");
       } finally {
-        setIsLoading(false)
-
+        setIsLoading(false);
       }
     }
   };
@@ -175,7 +282,7 @@ const PurchaseItem = () => {
       quantity: 1,
       pricePerUnit: product.productPurchasePrice || 0,
       discount: 0,
-      productPack: product.productPack || 1, // Use productPack from the response
+      productPack: product.productPack || 1,
     };
 
     dispatch(
@@ -188,7 +295,6 @@ const PurchaseItem = () => {
     const items = [...selectedItems, transformedProduct];
 
     // Recalculate totals
-    // console.log(items)
     const totals = calculateTotals(items);
 
     dispatch(setTotalAmount(totals.totalAmount));
@@ -197,6 +303,7 @@ const PurchaseItem = () => {
     setError('')
   };
 
+  // --- Dummy Add New Product Handler (Replaces API call) ---
   const handleAddNewProduct = async () => {
     if (!newProduct.productName || !newProduct.productPurchasePrice || !newProduct.salePrice1) {
       setError("Required fields missing!");
@@ -209,70 +316,75 @@ const PurchaseItem = () => {
     setIsLoading(true);
     setError("");
 
-    // Check if the vendor is a company or supplier
-    const isVendorCompany = companyData.find((company) => company._id === vendor);
-    const isVendorSupplier = supplierData.find((supplier) => supplier._id === vendor);
-
-    if (isVendorCompany) {
-      newProduct.vendorCompanyId = vendor;
-    } else if (isVendorSupplier) {
-      newProduct.vendorSupplierId = vendor;
-    }
-
     try {
-      const cleanedData = Object.fromEntries(
-        Object.entries(newProduct).filter(([_, value]) => value !== "")
-      );
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      const response = await config.registerStock(cleanedData);
+      const isVendorCompany = dummyCompanies.find((company) => company._id === vendor);
+      const isVendorSupplier = dummySuppliers.find((supplier) => supplier._id === vendor);
 
-      if (response && response.data) {
-        const registeredProduct = response.data.createdProduct;
-        console.log("Product registered: ", registeredProduct);
+      // Create new product with dummy data
+      const registeredProduct = {
+        _id: `prod_${Date.now()}`,
+        productName: newProduct.productName,
+        productCode: newProduct.productCode,
+        productPurchasePrice: parseFloat(newProduct.productPurchasePrice),
+        productPack: parseInt(newProduct.productPack) || 1,
+        productTotalQuantity: 0,
+        quantityUnit: newProduct.quantityUnit || 'pcs',
+        packUnit: newProduct.packUnit || 'pcs',
+        vendorCompanyDetails: isVendorCompany ? [{ _id: vendor }] : [],
+        vendorSupplierDetails: isVendorSupplier ? [{ _id: vendor }] : [],
+        salePriceDetails: [{
+          salePrice1: parseFloat(newProduct.salePrice1),
+          salePrice2: parseFloat(newProduct.salePrice2) || 0,
+          salePrice3: parseFloat(newProduct.salePrice3) || 0,
+          salePrice4: parseFloat(newProduct.salePrice4) || 0,
+        }]
+      };
 
-        const transformedProduct = {
-          _id: registeredProduct._id,
-          productId: registeredProduct._id,
-          productName: registeredProduct.productName,
-          quantity: 0,
-          pricePerUnit: registeredProduct.productPurchasePrice || 0,
-          discount: 0,
-          productPack: registeredProduct.productPack || 1, // Use productPack from the response
-        };
-        console.log("transformed product", transformedProduct);
+      console.log("Product registered: ", registeredProduct);
 
-        // Add the transformed product to selectedItems
-        dispatch(setSelectedItems([...selectedItems, transformedProduct]));
+      const transformedProduct = {
+        _id: registeredProduct._id,
+        productId: registeredProduct._id,
+        productName: registeredProduct.productName,
+        quantity: 0,
+        pricePerUnit: registeredProduct.productPurchasePrice || 0,
+        discount: 0,
+        productPack: registeredProduct.productPack || 1,
+      };
+      console.log("transformed product", transformedProduct);
 
-        // Fetch all products again to update the list
-        const products = await config.fetchAllProducts();
-        if (products && products.data) {
-          dispatch(setAllProducts(products.data));
-        }
+      // Add the transformed product to selectedItems
+      dispatch(setSelectedItems([...selectedItems, transformedProduct]));
 
-        // Reset the new product form
-        setNewProduct({
-          productCode: '',
-          productName: '',
-          categoryId: '',
-          typeId: '',
-          companyId: '',
-          productExpiryDate: '',
-          salePrice1: 0,
-          salePrice2: 0,
-          salePrice3: 0,
-          salePrice4: 0,
-          vendorSupplierId: '',
-          vendorCompanyId: '',
-          productDiscountPercentage: '',
-          productPack: 1,
-          productPurchasePrice: '',
-          productTotalQuantity: 0,
-          isNewProduct: true,
-        });
+      // Add to dummy products list
+      dummyProducts.push(registeredProduct);
 
-        setIsAddingNewProduct(false); // Hide new product form
-      }
+      // Reset the new product form
+      setNewProduct({
+        productCode: '',
+        productName: '',
+        categoryId: '',
+        typeId: '',
+        companyId: '',
+        productExpiryDate: '',
+        salePrice1: 0,
+        salePrice2: 0,
+        salePrice3: 0,
+        salePrice4: 0,
+        vendorSupplierId: '',
+        vendorCompanyId: '',
+        productDiscountPercentage: '',
+        productPack: 1,
+        productPurchasePrice: '',
+        productTotalQuantity: 0,
+        isNewProduct: true,
+      });
+
+      setIsAddingNewProduct(false);
+      alert("Product added successfully!");
     } catch (error) {
       setError("Failed to add product. Please try again.");
     } finally {
@@ -337,14 +449,13 @@ const PurchaseItem = () => {
             onChange={(e) => dispatch(setVendor(e.target.value))}
             value={vendor || ""}
           >
-            <option value="">Select Vendor company</option>
-            {companyData?.map((vendor, index) => (
+            <option value="">Select Vendor</option>
+            {dummyCompanies?.map((vendor, index) => (
               <option key={index} value={vendor._id}>
                 {vendor.companyName}
               </option>
             ))}
-            <option value="">Select Vendor Supplier</option>
-            {supplierData?.map((vendor, index) => (
+            {dummySuppliers?.map((vendor, index) => (
               <option key={index} value={vendor._id}>
                 {vendor.supplierName}
               </option>
@@ -359,7 +470,6 @@ const PurchaseItem = () => {
           onChange={(e) => dispatch(setBillNo(e.target.value))}
           divClass="flex gap-2 text-xs items-center"
           className="p-1"
-
         />
         <Input
           label="Date:"
@@ -377,7 +487,6 @@ const PurchaseItem = () => {
           divClass="flex gap-2 text-xs items-center"
           className="p-1"
         />
-
       </div>
 
       <div className="border-b my-3"></div>
@@ -393,7 +502,7 @@ const PurchaseItem = () => {
               <span className="text-xs w-24">Add New Product</span>
             </label>
 
-            {error && <p className={`text-red-500 font-thin w-full text-sm px-4 text-center`}>{error ? error : 'Invoice generated successfully!'}</p>}
+            {error && <p className={`text-red-500 font-thin w-full text-sm px-4 text-center`}>{error}</p>}
             <div className="flex w-full justify-end">
               <Button className='p-1 px-4 text-xs ' onClick={() => {
                 const res = window.confirm('Are you sure you want to clear the invoice')
@@ -416,8 +525,8 @@ const PurchaseItem = () => {
 
                   if (!vendor) {
                     setError("Please select a vendor!");
-                  } else if (!value.length === 0 && allProducts.length === 0) {
-                    setError("No products found for this vendor!");
+                  } else if (value.length === 0) {
+                    setError("");
                     dispatch(setSearchQuery(value));
                   } else {
                     setError("");
@@ -432,7 +541,7 @@ const PurchaseItem = () => {
               <Button
                 onClick={() => { handleGenerateBill() }}
                 className='p-1 px-4'
-              >Add</Button>
+              >Generate Bill</Button>
             </div>
           ) : (
             // New Product Fields
@@ -461,7 +570,7 @@ const PurchaseItem = () => {
               />
 
               <div className="flex items-center">
-                <label className="w-28" htmlFor="companyId">Select Category:</label>
+                <label className="w-28" htmlFor="categoryId">Select Category:</label>
                 <select
                   className={`border p-1 text-xs rounded w-44`}
                   name="categoryId"
@@ -469,14 +578,14 @@ const PurchaseItem = () => {
                   onChange={handleNewProductChange}
                 >
                   <option value="">Select Category</option>
-                  {categoryData && categoryData.map((category, index) => (
+                  {dummyCategories && dummyCategories.map((category, index) => (
                     <option key={index} value={category._id}>{category.categoryName}</option>
                   ))}
                 </select>
               </div>
 
               <div className="flex items-center">
-                <label className="w-28" htmlFor="companyId">Select Type:</label>
+                <label className="w-28" htmlFor="typeId">Select Type:</label>
                 <select
                   className={`border p-1 text-xs rounded w-44`}
                   name="typeId"
@@ -484,23 +593,8 @@ const PurchaseItem = () => {
                   onChange={handleNewProductChange}
                 >
                   <option value="">Select Type</option>
-                  {typeData && typeData.map((type, index) => (
+                  {dummyTypes && dummyTypes.map((type, index) => (
                     <option key={index} value={type._id}>{type.typeName}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex items-center">
-                <label className="w-28" htmlFor="companyId">Select Company:</label>
-                <select
-                  className={`border p-1 text-xs rounded w-44`}
-                  name="companyId"
-                  value={newProduct.companyId}
-                  onChange={handleNewProductChange}
-                >
-                  <option value="">Select Company</option>
-                  {companyData && companyData.map((company, index) => (
-                    <option key={index} value={company._id}>{company.companyName}</option>
                   ))}
                 </select>
               </div>
@@ -539,7 +633,6 @@ const PurchaseItem = () => {
                 <select
                   name="packUnit"
                   className='px-2 rounded-lg text-[11px]'
-                  // value={newProduct.packUnit}
                   onChange={handleNewProductChange}
                 >
                   <option value="">Select Pack Unit</option>
@@ -562,11 +655,10 @@ const PurchaseItem = () => {
                 <select
                   name="quantityUnit"
                   className='px-2 rounded-lg text-[11px]'
-                  // value={newProduct.quantityUnit}
                   onChange={handleNewProductChange}
                 >
                   <option value="">Select Quantity Unit</option>
-                  {['pcs', 'cotton', 'box', 'pack', 'kg', 'ton','meter', 'yard','ft'].map((unit, i) => (
+                  {['pcs', 'cotton', 'box', 'pack', 'kg', 'ton', 'meter', 'yard', 'ft'].map((unit, i) => (
                     <option key={i} value={unit}>{unit.toUpperCase()}</option>
                   ))}
                 </select>
@@ -581,15 +673,7 @@ const PurchaseItem = () => {
                 divClass="flex gap-2 text-xs items-center"
                 className="p-1"
               />
-              {/* <Input
-                label="Total Quantity:"
-                name="productTotalQuantity"
-                value={newProduct.productTotalQuantity}
-                onChange={handleNewProductChange}
-                labelClass="w-28"
-                divClass="flex gap-2 text-xs items-center"
-                className="p-1"
-              /> */}
+
               <Input
                 label="Sale Price 1: (Required)"
                 name="salePrice1"
@@ -601,47 +685,40 @@ const PurchaseItem = () => {
               />
               {
                 addSalePrice && (
-                  <div>
-                    <Input
-                      label="Sale Price 2:"
-                      name="salePrice2"
-                      value={newProduct.salePrice2}
-                      onChange={handleNewProductChange}
-                      labelClass="w-28"
-                      divClass="flex gap-2 text-xs items-center"
-                      className="p-1"
-                    />
-                  </div>
+                  <Input
+                    label="Sale Price 2:"
+                    name="salePrice2"
+                    value={newProduct.salePrice2}
+                    onChange={handleNewProductChange}
+                    labelClass="w-28"
+                    divClass="flex gap-2 text-xs items-center"
+                    className="p-1"
+                  />
                 )}
               {
                 addSalePrice && (
-                  <div>
-                    <Input
-                      label="Sale Price 3:"
-                      name="salePrice3"
-                      value={newProduct.salePrice3}
-                      onChange={handleNewProductChange}
-                      labelClass="w-28"
-                      divClass="flex gap-2 text-xs items-center"
-                      className="p-1"
-                    />
-                  </div>
+                  <Input
+                    label="Sale Price 3:"
+                    name="salePrice3"
+                    value={newProduct.salePrice3}
+                    onChange={handleNewProductChange}
+                    labelClass="w-28"
+                    divClass="flex gap-2 text-xs items-center"
+                    className="p-1"
+                  />
                 )}
               {
                 addSalePrice && (
-                  <div>
-                    <Input
-                      label="Sale Price 4:"
-                      name="salePrice4"
-                      value={newProduct.salePrice4}
-                      onChange={handleNewProductChange}
-                      labelClass="w-28"
-                      divClass="flex gap-2 text-xs items-center"
-                      className="p-1"
-                    />
-                  </div>
+                  <Input
+                    label="Sale Price 4:"
+                    name="salePrice4"
+                    value={newProduct.salePrice4}
+                    onChange={handleNewProductChange}
+                    labelClass="w-28"
+                    divClass="flex gap-2 text-xs items-center"
+                    className="p-1"
+                  />
                 )}
-
 
               <div className="flex items-center gap-2">
                 <input
@@ -692,7 +769,7 @@ const PurchaseItem = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-center text-gray-500 py-2">
+                    <td colSpan="5" className="text-center text-gray-500 py-2">
                       No products found for this vendor!
                     </td>
                   </tr>
@@ -718,7 +795,7 @@ const PurchaseItem = () => {
             </tr>
           </thead>
           <tbody>
-            {selectedItems.map((item, index) => (
+            {selectedItems && selectedItems.map((item, index) => (
               <tr key={index} className="border-t">
                 <td className="py-2 px-1 text-left">{index + 1}</td>
                 <td className="py-2 px-1 text-left">{item.productName}</td>
@@ -736,7 +813,6 @@ const PurchaseItem = () => {
                     value={item.pricePerUnit}
                     onChange={(e) => handleItemChange(index, "pricePerUnit", parseFloat(e.target.value))}
                     className="text-right p-1"
-
                   />
                 </td>
                 <td className="py-2 px-1 text-left">
@@ -745,7 +821,6 @@ const PurchaseItem = () => {
                     value={item.discount}
                     onChange={(e) => handleItemChange(index, "discount", parseFloat(e.target.value))}
                     className="text-right p-1"
-
                   />
                 </td>
                 <td className="py-2 px-1 text-left">{(item.quantity * item.pricePerUnit).toFixed(2)}</td>

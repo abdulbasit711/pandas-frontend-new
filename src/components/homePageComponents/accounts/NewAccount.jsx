@@ -7,6 +7,103 @@ import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import Loader from "../../../pages/Loader";
 
+// Dummy data for accounts hierarchy
+const dummyAccountsHierarchy = [
+  {
+    _id: 'acc_001',
+    accountName: 'Assets',
+    subCategories: [
+      {
+        _id: 'sub_001',
+        accountSubCategoryName: 'Current Assets',
+        parentAccount: 'acc_001',
+        individualAccounts: [
+          { _id: 'ind_001', individualAccountName: 'Cash in Hand', accountBalance: 150000 },
+          { _id: 'ind_002', individualAccountName: 'Bank Account - Primary', accountBalance: 500000 },
+          { _id: 'ind_003', individualAccountName: 'Accounts Receivable', accountBalance: 200000 },
+        ]
+      },
+      {
+        _id: 'sub_002',
+        accountSubCategoryName: 'Fixed Assets',
+        parentAccount: 'acc_001',
+        individualAccounts: [
+          { _id: 'ind_004', individualAccountName: 'Building', accountBalance: 1000000 },
+          { _id: 'ind_005', individualAccountName: 'Equipment', accountBalance: 300000 },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_002',
+    accountName: 'Liabilities',
+    subCategories: [
+      {
+        _id: 'sub_003',
+        accountSubCategoryName: 'Current Liabilities',
+        parentAccount: 'acc_002',
+        individualAccounts: [
+          { _id: 'ind_006', individualAccountName: 'Accounts Payable', accountBalance: 100000 },
+          { _id: 'ind_007', individualAccountName: 'Short-term Loan', accountBalance: 50000 },
+        ]
+      },
+      {
+        _id: 'sub_004',
+        accountSubCategoryName: 'Long-term Liabilities',
+        parentAccount: 'acc_002',
+        individualAccounts: [
+          { _id: 'ind_008', individualAccountName: 'Long-term Loan', accountBalance: 500000 },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_003',
+    accountName: 'Equity',
+    subCategories: [
+      {
+        _id: 'sub_005',
+        accountSubCategoryName: 'Capital',
+        parentAccount: 'acc_003',
+        individualAccounts: [
+          { _id: 'ind_009', individualAccountName: 'Paid-up Capital', accountBalance: 1000000 },
+          { _id: 'ind_010', individualAccountName: 'Retained Earnings', accountBalance: 350000 },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_004',
+    accountName: 'Revenue',
+    subCategories: [
+      {
+        _id: 'sub_006',
+        accountSubCategoryName: 'Sales Revenue',
+        parentAccount: 'acc_004',
+        individualAccounts: [
+          { _id: 'ind_011', individualAccountName: 'Direct Sales', accountBalance: 750000 },
+          { _id: 'ind_012', individualAccountName: 'Wholesale Revenue', accountBalance: 450000 },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_005',
+    accountName: 'Expenses',
+    subCategories: [
+      {
+        _id: 'sub_007',
+        accountSubCategoryName: 'Operating Expenses',
+        parentAccount: 'acc_005',
+        individualAccounts: [
+          { _id: 'ind_013', individualAccountName: 'Salary & Wages', accountBalance: 200000 },
+          { _id: 'ind_014', individualAccountName: 'Rent Expense', accountBalance: 50000 },
+        ]
+      }
+    ]
+  }
+];
+
 const NewAccount = () => {
   const [accounts, setAccounts] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
@@ -46,30 +143,26 @@ const NewAccount = () => {
   const fetchAccounts = async () => {
     try {
       setIsLoading(true);
-      const response = await config.getAccounts();
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Use dummy data instead of API call
+      const accountsData = dummyAccountsHierarchy;
 
-      if (response) {
-        const accountsData = response.data;
+      // Set all accounts directly
+      setAccounts(accountsData);
 
-        // Set all accounts directly
-        setAccounts(accountsData);
+      // Extract and flatten subCategories from accounts
+      const allSubCategories = accountsData.flatMap((account) => account.subCategories || []);
+      setSubCategories(allSubCategories);
 
-        // Extract and flatten subCategories from accounts
-        const allSubCategories = accountsData.flatMap((account) => account.subCategories || []);
-        setSubCategories(allSubCategories);
+      // Extract and flatten individualAccounts from subCategories
+      const allIndividualAccounts = allSubCategories.flatMap(
+        (subCategory) => subCategory.individualAccounts || []
+      );
+      setIndividualAccounts(allIndividualAccounts);
+      setAllIndividualAccounts(allIndividualAccounts);
 
-        // Extract and flatten individualAccounts from subCategories
-        const allIndividualAccounts = allSubCategories.flatMap(
-          (subCategory) => subCategory.individualAccounts || []
-        );
-        setIndividualAccounts(allIndividualAccounts);
-        setAllIndividualAccounts(allIndividualAccounts);
-        // console.log("individual accounts:", individualAccounts);
-        // console.log("sub category accounts:", subCategories);
-        // console.log(" accounts:", accounts);
-
-
-      }
     } catch (error) {
       console.error("Failed fetching accounts: ", error);
     } finally {
@@ -81,67 +174,49 @@ const NewAccount = () => {
   const handleSubCategorySubmit = async (data) => {
     try {
       if (editingSubCategory) {
-
-        const subAccountId = editingSubCategory?._id
-
-        const response = await config.updateSubCategory(subAccountId, data);
+        // Simulate update
         setSubCategories(subCategories.map(subCategory =>
-          subCategory._id === editingSubCategory._id ? response.data : subCategory
+          subCategory._id === editingSubCategory._id ? { ...editingSubCategory, ...data } : subCategory
         ));
         setEditingSubCategory(null);
       } else {
-        const response = await config.addSubCategory(data);
-        setSubCategories([...subCategories, response.data]);
+        // Simulate create with new ID
+        const newSubCategory = {
+          _id: `sub_${Date.now()}`,
+          ...data,
+          individualAccounts: []
+        };
+        setSubCategories([...subCategories, newSubCategory]);
       }
       setValue('accountSubCategoryName', '')
       reset();
     } catch (error) {
       console.error("Failed to register new subcategory", error);
-      const htmlString = error?.response?.data;
-
-      // Parse the HTML string into a DOM object
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlString, 'text/html');
-
-      const preContent = doc.querySelector('pre').innerHTML.replace(/<br\s*\/?>/gi, '\n');
-
-      // Extract only the first line (the error message)
-      const errorMessage = preContent.split('\n')[0].slice(6); // Get the first line
-
-      setSubCategoryAccountError(errorMessage)
+      setSubCategoryAccountError("Failed to register subcategory")
     }
   };
 
   const handleAccountSubmit = async (data) => {
     try {
       if (editingAccount) {
-        const accountId = editingAccount?._id
-
-        const response = await config.updateAccount(accountId, data);
+        // Simulate update
         setAccounts(accounts.map(account =>
-          account._id === editingAccount._id ? response.data : account
+          account._id === editingAccount._id ? { ...editingAccount, ...data } : account
         ));
         setEditingAccount(null);
       } else {
-        const response = await config.addAccount(data);
-        setAccounts([...accounts, response.data]);
+        // Simulate create with new ID
+        const newAccount = {
+          _id: `acc_${Date.now()}`,
+          ...data,
+          subCategories: []
+        };
+        setAccounts([...accounts, newAccount]);
       }
       reset();
     } catch (error) {
       console.error("Failed to register new account", error);
-
-      const htmlString = error?.response?.data;
-
-      // Parse the HTML string into a DOM object
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlString, 'text/html');
-
-      const preContent = doc.querySelector('pre').innerHTML.replace(/<br\s*\/?>/gi, '\n');
-
-      // Extract only the first line (the error message)
-      const errorMessage = preContent.split('\n')[0].slice(6); // Get the first line
-
-      setAccountError(errorMessage)
+      setAccountError("Failed to register account")
     }
   };
 
@@ -150,34 +225,29 @@ const NewAccount = () => {
 
     setIndividualAccountError('')
     try {
-      const individualAccountId = editingIndividualAccount?._id
       if (editingIndividualAccount) {
-        const response = await config.updateIndividualAccount(individualAccountId, data);
+        // Simulate update
         setIndividualAccounts(individualAccounts.map(account =>
-          account._id === editingIndividualAccount._id ? response.data : account
+          account._id === editingIndividualAccount._id ? { ...editingIndividualAccount, ...data } : account
+        ));
+        setAllIndividualAccounts(allIndividualAccounts.map(account =>
+          account._id === editingIndividualAccount._id ? { ...editingIndividualAccount, ...data } : account
         ));
         setEditingIndividualAccount(null);
       } else {
-        const response = await config.addIndividualAccount(data);
-        setIndividualAccounts([...individualAccounts, response.data]);
+        // Simulate create with new ID
+        const newAccount = {
+          _id: `ind_${Date.now()}`,
+          ...data,
+          accountBalance: parseFloat(data.accountBalance) || 0
+        };
+        setIndividualAccounts([...individualAccounts, newAccount]);
+        setAllIndividualAccounts([...allIndividualAccounts, newAccount]);
       }
       reset();
     } catch (error) {
       console.log("failed to register new account", error);
-      // console.log("error response data: ", error);
-
-      const htmlString = error?.response?.data;
-
-      // Parse the HTML string into a DOM object
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlString, 'text/html');
-
-      const preContent = doc.querySelector('pre').innerHTML.replace(/<br\s*\/?>/gi, '\n');
-
-      // Extract only the first line (the error message)
-      const errorMessage = preContent.split('\n')[0].slice(6); // Get the first line
-
-      setIndividualAccountError(errorMessage)
+      setIndividualAccountError("Failed to register individual account")
     }
   };
 
@@ -275,78 +345,6 @@ const NewAccount = () => {
                     </option>
                   ))}
                 </select>
-
-
-                {/* <div className="flex gap-4">
-                <Input
-                label="Customer"
-                labelClass='text xs'
-                  divClass='flex gap-1 items-center text-xs justify-start'
-                  className='px-4 py-2 text-xs'
-                  type="radio"
-                  value="Customer"
-                  checked={accountType === "Customer"}
-                  onChange={() => setAccountType("Customer")}
-                />
-                <Input
-                  label="Supplier"
-                  labelClass='text xs'
-                  divClass='flex gap-1 items-center text-xs justify-start'
-                  className='px-4 py-2 text-xs'
-                  type="radio"
-                  value="Supplier"
-                  checked={accountType === "Supplier"}
-                  onChange={() => setAccountType("Supplier")}
-                  />
-                  <Input
-                  label="Company"
-                  labelClass='text xs'
-                  divClass='flex gap-1 items-center text-xs justify-start'
-                  className='px-4 py-2 text-xs'
-                  type="radio"
-                  value="Company"
-                  checked={accountType === "Company"}
-                  onChange={() => setAccountType("Company")}
-                  />
-                  </div> */}
-
-                {/* {accountType === "Customer" &&
-                <select
-                className="border rounded px-3 py-2 w-52 text-xs"
-                {...register("customerId")}
-                >
-                <option value="">Select Customer</option>
-                {customerData.map((customer) => (
-                  <option key={customer._id} value={customer._id}>
-                  {customer.customerName}
-                  </option>
-                  ))}
-                  </select>} */}
-
-                {/* {accountType === "Supplier" &&
-                <select
-                className="border rounded px-3 py-2 w-52 text-xs"
-                  {...register("supplierId")}
-                >
-                  <option value="">Select Supplier</option>
-                  {supplierData.map((supplier) => (
-                    <option key={supplier._id} value={supplier._id}>
-                      {supplier.supplierName}
-                    </option>
-                  ))}
-                </select>} */}
-                {/* {accountType === "Company" &&
-                <select
-                className="border rounded px-3 py-2 w-52 text-xs"
-                {...register("companyId")}
-                >
-                <option value="">Select Company</option>
-                {companyData.map((company) => (
-                    <option key={company._id} value={company._id}>
-                      {company.companyName}
-                      </option>
-                      ))}
-                      </select>} */}
 
                 <Button type="submit" className="text-sm">{!editingIndividualAccount ? 'Register' : 'Update'}</Button>
 
@@ -479,7 +477,8 @@ const NewAccount = () => {
                         <button
                           className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded-md"
                           onClick={() => handleEditAccount(account)}
-                        >{(editingAccount && editingAccount._id === account._id) ? "Cancel" : "Edit"}</button>                  </td>
+                        >{(editingAccount && editingAccount._id === account._id) ? "Cancel" : "Edit"}</button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

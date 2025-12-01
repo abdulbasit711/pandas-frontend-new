@@ -19,32 +19,28 @@ import {
 } from 'recharts';
 import config from '../../../features/config';
 import { useSelector } from 'react-redux';
-import SearchableDropdown from '../../SearchableDropDown';
-
-/*
-  ReportsDashboard.jsx
-  -------------------------------------------------
-  A single-file React + Tailwind dashboard that contains
-  components for all requested reports and a filter bar.
-
-  Features:
-  - Report selector (productSales, salesByCategory, salesByType, etc.)
-  - Date range picker
-  - Optional product/category/type input
-  - Fetches from /api/reports (your controller) using query params
-  - Shows summary card + chart + table breakdown
-  - Uses Recharts for visualization
-
-  How to use:
-  1. Install deps: npm i react react-dom axios recharts
-  2. Ensure Tailwind CSS is set up in your project.
-  3. Place this file and import <ReportsDashboard /> into your app.
-
-  Note: The component expects the backend route you created at GET /api/reports
-  with query params: reportType, productId, categoryId, typeId, startDate, endDate
-*/
+import SearchableDropdown from '../../../components/SearchableDropdown';
 
 const COLORS = ['#4f46e5', '#06b6d4', '#f97316', '#10b981', '#ef4444', '#8b5cf6'];
+
+// --- Dummy Data ---
+const dummyProductsData = {
+  "electronics": { productName: "Laptop Pro", totalQuantity: 245, totalRevenue: 1225000 },
+  "accessories": { productName: "USB Cable", totalQuantity: 1250, totalRevenue: 62500 },
+  "software": { productName: "Windows 11", totalQuantity: 85, totalRevenue: 42500 },
+};
+
+const dummyCategoryData = {
+  "electronics": { categoryName: "Electronics", totalQuantity: 450, totalRevenue: 2250000 },
+  "accessories": { categoryName: "Accessories", totalQuantity: 2100, totalRevenue: 315000 },
+  "software": { categoryName: "Software", totalQuantity: 300, totalRevenue: 150000 },
+};
+
+const dummyTypeData = {
+  "computers": { typeName: "Computers", totalQuantity: 385, totalRevenue: 1925000 },
+  "peripherals": { typeName: "Peripherals", totalQuantity: 1250, totalRevenue: 187500 },
+  "licenses": { typeName: "Licenses", totalQuantity: 300, totalRevenue: 150000 },
+};
 
 function SmallInput({ label, value, onChange, placeholder, type = 'text' }) {
   return (
@@ -108,24 +104,54 @@ export default function SaleReports() {
   const [error, setError] = useState(null);
 
   const { allProducts } = useSelector((state) => state.saleItems);
-  const categoryData = useSelector((state) => state.categories.categoryData); const typeData = useSelector((state) => state.types.typeData);
+  const categoryData = useSelector((state) => state.categories.categoryData);
+  const typeData = useSelector((state) => state.types.typeData);
 
+  // --- Dummy Data Fetcher (Replaces API call) ---
   async function fetchReport() {
-    setLoading(true); setError(null);
-    try {
-      const params = { reportType, startDate, endDate };
-      if (reportType === 'productSales' && productId) params.productId = productId;
-      if (reportType === 'salesByCategory' && categoryId) params.categoryId = categoryId;
-      if (reportType === 'salesByType' && typeId) params.typeId = typeId;
+    setLoading(true);
+    setError(null);
+    
+    // Simulate network delay
+    setTimeout(() => {
+      try {
+        let dummyData = null;
 
-      // const res = await axios.get('/api/reports', { params });
-      const res = await config.getReports(params)
-      console.log('res', res)
-      setReportData(res.data);
-    } catch (err) {
-      console.error(err);
-      setError(err?.response?.data?.message || err.message || 'Something went wrong');
-    } finally { setLoading(false); }
+        if (reportType === 'productSales') {
+          if (productId) {
+            // Get dummy data based on product ID
+            const productKey = productId.toLowerCase().includes('laptop') ? 'electronics' : 
+                             productId.toLowerCase().includes('usb') ? 'accessories' : 'software';
+            dummyData = { ...dummyProductsData[productKey] };
+          } else {
+            dummyData = dummyProductsData['electronics'];
+          }
+        } else if (reportType === 'salesByCategory') {
+          if (categoryId) {
+            const categoryKey = categoryId.toLowerCase().includes('electron') ? 'electronics' :
+                              categoryId.toLowerCase().includes('access') ? 'accessories' : 'software';
+            dummyData = { ...dummyCategoryData[categoryKey] };
+          } else {
+            dummyData = dummyCategoryData['electronics'];
+          }
+        } else if (reportType === 'salesByType') {
+          if (typeId) {
+            const typeKey = typeId.toLowerCase().includes('computer') ? 'computers' :
+                          typeId.toLowerCase().includes('periph') ? 'peripherals' : 'licenses';
+            dummyData = { ...dummyTypeData[typeKey] };
+          } else {
+            dummyData = dummyTypeData['computers'];
+          }
+        }
+
+        setReportData(dummyData);
+      } catch (err) {
+        console.error(err);
+        setError(err?.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
+    }, 500); // 500ms delay to simulate API call
   }
 
   useEffect(() => {
@@ -140,7 +166,6 @@ export default function SaleReports() {
       return [{ name: reportData.productName || 'Product', qty: reportData.totalQuantity || 0, revenue: reportData.totalRevenue || 0 }];
     }
     if (reportType === 'salesByCategory' || reportType === 'salesByType') {
-      // summary only contains totals; optional: ask backend to return breakdown per product
       return [{ name: reportData.categoryName || reportData.typeName || 'Group', qty: reportData.totalQuantity || 0, revenue: reportData.totalRevenue || 0 }];
     }
     return [];
@@ -149,10 +174,10 @@ export default function SaleReports() {
   const tableRows = useMemo(() => {
     if (!reportData) return [];
     if (reportType === 'productSales') {
-      return [{ 'Product': reportData.productName, 'Qty Sold': reportData.totalQuantity, 'Revenue': reportData.totalRevenue }];
+      return [{ 'Product': reportData.productName, 'Qty Sold': reportData.totalQuantity, 'Revenue': `Rs ${reportData.totalRevenue}` }];
     }
     if (reportType === 'salesByCategory' || reportType === 'salesByType') {
-      return [{ 'Group': reportData.categoryName || reportData.typeName, 'Qty Sold': reportData.totalQuantity, 'Revenue': reportData.totalRevenue }];
+      return [{ 'Group': reportData.categoryName || reportData.typeName, 'Qty Sold': reportData.totalQuantity, 'Revenue': `Rs ${reportData.totalRevenue}` }];
     }
     return [];
   }, [reportData, reportType]);
@@ -183,39 +208,39 @@ export default function SaleReports() {
               <option value="salesByType">Sales by Type (single type)</option>
             </select>
 
-           <div className="space-y-4">
-      {reportType === "productSales" && (
-        <SearchableDropdown
-          label="Product"
-          items={allProducts}
-          displayKey="productName"
-          onSelect={(p) => setProductId(p._id)}
-        />
-      )}
+            <div className="space-y-4 mt-4">
+              {reportType === "productSales" && (
+                <SearchableDropdown
+                  label="Product"
+                  items={allProducts}
+                  displayKey="productName"
+                  onSelect={(p) => setProductId(p._id)}
+                />
+              )}
 
-      {reportType === "salesByCategory" && (
-        <SearchableDropdown
-          label="Category"
-          items={categoryData}
-          displayKey="categoryName"
-          onSelect={(c) => setCategoryId(c._id)}
-        />
-      )}
+              {reportType === "salesByCategory" && (
+                <SearchableDropdown
+                  label="Category"
+                  items={categoryData}
+                  displayKey="categoryName"
+                  onSelect={(c) => setCategoryId(c._id)}
+                />
+              )}
 
-      {reportType === "salesByType" && (
-        <SearchableDropdown
-          label="Type"
-          items={typeData}
-          displayKey="typeName"
-          onSelect={(t) => setTypeId(t._id)}
-        />
-      )}
-    </div>
+              {reportType === "salesByType" && (
+                <SearchableDropdown
+                  label="Type"
+                  items={typeData}
+                  displayKey="typeName"
+                  onSelect={(t) => setTypeId(t._id)}
+                />
+              )}
+            </div>
           </div>
 
           <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
             <KpiCard title="Quantity Sold" value={reportData?.totalQuantity ?? 0} sub="Total units sold in range" />
-            <KpiCard title="Revenue (computed)" value={reportData?.totalRevenue ? `Rs ${reportData?.totalRevenue}` : 'Rs 0'} sub={`Revenue for ${reportData?.productName}`} />
+            <KpiCard title="Revenue (computed)" value={reportData?.totalRevenue ? `Rs ${reportData?.totalRevenue}` : 'Rs 0'} sub={`Revenue for ${reportData?.productName || reportData?.categoryName || reportData?.typeName}`} />
             <KpiCard title="Products in selection" value={reportType === 'productSales' ? (reportData?.productName ? 1 : 0) : '-'} sub={reportType === 'productSales' ? reportData?.productName : '—'} />
           </div>
         </div>

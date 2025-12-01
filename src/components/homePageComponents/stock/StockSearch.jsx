@@ -28,6 +28,200 @@ const StockSearch = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 400;
 
+    // Dummy Products Data
+    const dummyAllProducts = [
+        {
+            _id: "prod_001",
+            productCode: "PEP500",
+            productName: "Pepsi 500ml",
+            productExpiryDate: "2025-12-31",
+            typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+            categoryDetails: [{ _id: "cat_001", categoryName: "Soft Drinks", productName: "Soft Drinks" }],
+            companyDetails: [{ _id: "comp_001", companyName: "PepsiCo" }],
+            vendorSupplierDetails: [{ _id: "sup_001", supplierName: "Direct Beverages" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 60, salePrice2: 55, salePrice3: 50, salePrice4: 45 }],
+            productPack: 1,
+            productPurchasePrice: 40,
+            productTotalQuantity: 500,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 5,
+            status: true,
+            createdAt: new Date(2024, 0, 10).toISOString(),
+        },
+        {
+            _id: "prod_002",
+            productCode: "SPR1L",
+            productName: "Sprite 1L",
+            productExpiryDate: "2025-11-30",
+            typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+            categoryDetails: [{ _id: "cat_001", categoryName: "Soft Drinks", productName: "Soft Drinks" }],
+            companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+            vendorSupplierDetails: [{ _id: "sup_001", supplierName: "Direct Beverages" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 80, salePrice2: 75, salePrice3: 70, salePrice4: 65 }],
+            productPack: 1,
+            productPurchasePrice: 55,
+            productTotalQuantity: 300,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 8,
+            status: true,
+            createdAt: new Date(2024, 0, 15).toISOString(),
+        },
+        {
+            _id: "prod_003",
+            productCode: "COK250",
+            productName: "Coke 250ml",
+            productExpiryDate: "2025-10-31",
+            typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+            categoryDetails: [{ _id: "cat_001", categoryName: "Soft Drinks", productName: "Soft Drinks" }],
+            companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+            vendorSupplierDetails: [{ _id: "sup_001", supplierName: "Direct Beverages" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 45, salePrice2: 40, salePrice3: 35, salePrice4: 30 }],
+            productPack: 1,
+            productPurchasePrice: 25,
+            productTotalQuantity: 1000,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 3,
+            status: true,
+            createdAt: new Date(2024, 0, 20).toISOString(),
+        },
+        {
+            _id: "prod_004",
+            productCode: "FAN1LOR",
+            productName: "Fanta Orange 1L",
+            productExpiryDate: "2025-12-15",
+            typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+            categoryDetails: [{ _id: "cat_001", categoryName: "Soft Drinks", productName: "Soft Drinks" }],
+            companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+            vendorSupplierDetails: [{ _id: "sup_001", supplierName: "Direct Beverages" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 75, salePrice2: 70, salePrice3: 65, salePrice4: 60 }],
+            productPack: 1,
+            productPurchasePrice: 50,
+            productTotalQuantity: 200,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 6,
+            status: true,
+            createdAt: new Date(2024, 1, 5).toISOString(),
+        },
+        {
+            _id: "prod_005",
+            productCode: "MDEW500",
+            productName: "Mountain Dew 500ml",
+            productExpiryDate: "2025-11-20",
+            typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+            categoryDetails: [{ _id: "cat_001", categoryName: "Soft Drinks", productName: "Soft Drinks" }],
+            companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+            vendorSupplierDetails: [{ _id: "sup_001", supplierName: "Direct Beverages" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 65, salePrice2: 60, salePrice3: 55, salePrice4: 50 }],
+            productPack: 1,
+            productPurchasePrice: 42,
+            productTotalQuantity: 450,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 4,
+            status: true,
+            createdAt: new Date(2024, 1, 10).toISOString(),
+        },
+        {
+            _id: "prod_006",
+            productCode: "7UP1L",
+            productName: "7UP 1L",
+            productExpiryDate: "2025-12-10",
+            typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+            categoryDetails: [{ _id: "cat_001", categoryName: "Soft Drinks", productName: "Soft Drinks" }],
+            companyDetails: [{ _id: "comp_003", companyName: "7UP Inc" }],
+            vendorSupplierDetails: [{ _id: "sup_002", supplierName: "Premium Beverages" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 85, salePrice2: 80, salePrice3: 75, salePrice4: 70 }],
+            productPack: 1,
+            productPurchasePrice: 58,
+            productTotalQuantity: 250,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 7,
+            status: true,
+            createdAt: new Date(2024, 1, 15).toISOString(),
+        },
+        {
+            _id: "prod_007",
+            productCode: "NSW500",
+            productName: "Nestle Water 500ml",
+            productExpiryDate: "2025-09-30",
+            typeDetails: [{ _id: "type_002", typeName: "Water" }],
+            categoryDetails: [{ _id: "cat_002", categoryName: "Bottled Water", productName: "Bottled Water" }],
+            companyDetails: [{ _id: "comp_004", companyName: "Nestle" }],
+            vendorSupplierDetails: [{ _id: "sup_002", supplierName: "Premium Beverages" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 35, salePrice2: 32, salePrice3: 30, salePrice4: 28 }],
+            productPack: 1,
+            productPurchasePrice: 20,
+            productTotalQuantity: 800,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 2,
+            status: true,
+            createdAt: new Date(2024, 2, 5).toISOString(),
+        },
+        {
+            _id: "prod_008",
+            productCode: "AQU1.5L",
+            productName: "Aquafina Water 1.5L",
+            productExpiryDate: "2025-10-15",
+            typeDetails: [{ _id: "type_002", typeName: "Water" }],
+            categoryDetails: [{ _id: "cat_002", categoryName: "Bottled Water", productName: "Bottled Water" }],
+            companyDetails: [{ _id: "comp_005", companyName: "Aquafina" }],
+            vendorSupplierDetails: [{ _id: "sup_003", supplierName: "Water Suppliers Ltd" }],
+            vendorCompanyDetails: [],
+            salePriceDetails: [{ salePrice1: 55, salePrice2: 50, salePrice3: 48, salePrice4: 45 }],
+            productPack: 1,
+            productPurchasePrice: 35,
+            productTotalQuantity: 600,
+            quantityUnit: "pcs",
+            packUnit: "pcs",
+            productUnit: "ml",
+            productDiscountPercentage: 3,
+            status: true,
+            createdAt: new Date(2024, 2, 10).toISOString(),
+        },
+    ];
+
+    const dummyCompanyData = [
+        { _id: "comp_001", companyName: "PepsiCo" },
+        { _id: "comp_002", companyName: "Coca-Cola" },
+        { _id: "comp_003", companyName: "7UP Inc" },
+        { _id: "comp_004", companyName: "Nestle" },
+        { _id: "comp_005", companyName: "Aquafina" },
+    ];
+
+    const dummyCategoryData = [
+        { _id: "cat_001", categoryName: "Soft Drinks" },
+        { _id: "cat_002", categoryName: "Bottled Water" },
+        { _id: "cat_003", categoryName: "Energy Drinks" },
+        { _id: "cat_004", categoryName: "Juices" },
+    ];
+
+    const dummyTypeData = [
+        { _id: "type_001", typeName: "Beverage" },
+        { _id: "type_002", typeName: "Water" },
+        { _id: "type_003", typeName: "Premium" },
+        { _id: "type_004", typeName: "Economy" },
+    ];
+
     const {
         register,
         handleSubmit,
@@ -38,12 +232,19 @@ const StockSearch = () => {
 
     const dispatch = useDispatch();
 
-    const allProducts = useSelector(state => state.saleItems.allProducts);
-    const companyData = useSelector(state => state.companies.companyData);
-    const categoryData = useSelector(state => state.categories.categoryData);
-    const typeData = useSelector(state => state.types.typeData);
+    const allProducts = useSelector(state => state.saleItems.allProducts) || dummyAllProducts;
+    const companyData = useSelector(state => state.companies.companyData) || dummyCompanyData;
+    const categoryData = useSelector(state => state.categories.categoryData) || dummyCategoryData;
+    const typeData = useSelector(state => state.types.typeData) || dummyTypeData;
 
     const inputRef = useRef(null);
+
+    // Initialize with dummy data on mount
+    useEffect(() => {
+        dispatch(setAllProducts(dummyAllProducts));
+        setFilteredProducts(dummyAllProducts);
+        inputRef.current?.focus();
+    }, [dispatch]);
 
     const handleEdit = (id, name, product) => {
         setProductId(id);
@@ -89,22 +290,42 @@ const StockSearch = () => {
         }
 
         try {
-            const response = await config.updateProduct(cleanedData);
-            if (response) {
-                setSuccessMessage(response.message);
-                setIsLoading(false);
-                setIsStockUpdated(true);
-                setIsButtonLoading(false);
-                setIsEdit(false);
-                reset();
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
 
-                const allProductsBefore = await config.fetchAllProducts();
-                if (allProductsBefore.data) {
-                    dispatch(setAllProducts(allProductsBefore.data));
-                }
+            // Find and update product in dummy data
+            const productIndex = dummyAllProducts.findIndex(p => p._id === data.productId);
+            if (productIndex !== -1) {
+                dummyAllProducts[productIndex] = {
+                    ...dummyAllProducts[productIndex],
+                    productCode: cleanedData.productCode || dummyAllProducts[productIndex].productCode,
+                    productName: cleanedData.productName || dummyAllProducts[productIndex].productName,
+                    productExpiryDate: cleanedData.productExpiryDate || dummyAllProducts[productIndex].productExpiryDate,
+                    productDiscountPercentage: cleanedData.productDiscountPercentage || dummyAllProducts[productIndex].productDiscountPercentage,
+                    productPack: cleanedData.productPack || dummyAllProducts[productIndex].productPack,
+                    productPurchasePrice: cleanedData.productPurchasePrice || dummyAllProducts[productIndex].productPurchasePrice,
+                    productTotalQuantity: cleanedData.productTotalQuantity ? cleanedData.productTotalQuantity * dummyAllProducts[productIndex].productPack : dummyAllProducts[productIndex].productTotalQuantity,
+                    quantityUnit: cleanedData.quantityUnit || dummyAllProducts[productIndex].quantityUnit,
+                    packUnit: cleanedData.packUnit || dummyAllProducts[productIndex].packUnit,
+                    salePriceDetails: [{
+                        salePrice1: cleanedData.salePrice1 || dummyAllProducts[productIndex].salePriceDetails[0].salePrice1,
+                        salePrice2: cleanedData.salePrice2 || dummyAllProducts[productIndex].salePriceDetails[0].salePrice2,
+                        salePrice3: cleanedData.salePrice3 || dummyAllProducts[productIndex].salePriceDetails[0].salePrice3,
+                        salePrice4: cleanedData.salePrice4 || dummyAllProducts[productIndex].salePriceDetails[0].salePrice4,
+                    }],
+                };
             }
+
+            dispatch(setAllProducts([...dummyAllProducts]));
+            setSuccessMessage("Product updated successfully");
+            setIsLoading(false);
+            setIsStockUpdated(true);
+            setIsButtonLoading(false);
+            setIsEdit(false);
+            reset();
         } catch (error) {
             console.log("error updating Product:", error);
+            setError("Failed to update product");
         } finally {
             setIsLoading(false);
             setIsStockUpdated(true);
@@ -117,22 +338,24 @@ const StockSearch = () => {
         setDeleteId(id);
 
         try {
-            const response = await config.deleteProduct(id);
-            if (response) {
-                setSuccessMessage(response.message);
-                setIsButtonLoading(false);
-                setSearchQuery('');
-                setDeleteId('');
-                setIsLoading(false);
-                setIsStockUpdated(true);
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
 
-                const allProductsBefore = await config.fetchAllProducts();
-                if (allProductsBefore.data) {
-                    dispatch(setAllProducts(allProductsBefore.data));
-                }
-            }
+            // Remove product from dummy data
+            const filteredData = dummyAllProducts.filter(p => p._id !== id);
+            dummyAllProducts.splice(0, dummyAllProducts.length, ...filteredData);
+
+            dispatch(setAllProducts([...dummyAllProducts]));
+            setFilteredProducts([...dummyAllProducts]);
+            setSuccessMessage("Product deleted successfully");
+            setIsButtonLoading(false);
+            setSearchQuery('');
+            setDeleteId('');
+            setIsLoading(false);
+            setIsStockUpdated(true);
         } catch (error) {
             console.log("error deleting Product:", error);
+            setError("Failed to delete product");
         } finally {
             setIsLoading(false);
             setIsStockUpdated(true);
@@ -142,13 +365,9 @@ const StockSearch = () => {
     };
 
     useEffect(() => {
-        inputRef.current?.focus();
-    }, []);
-
-    useEffect(() => {
-        let results = allProducts;
+        let results = allProducts && allProducts.length > 0 ? allProducts : dummyAllProducts;
         if (searchQuery) {
-            results = allProducts?.filter(
+            results = results.filter(
                 (product) =>
                     product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     product.productCode?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -175,7 +394,7 @@ const StockSearch = () => {
             product.companyDetails[0]?.companyName,
             product.vendorSupplierDetails[0]?.supplierName || product.vendorCompanyDetails[0]?.companyName,
             product.productDiscountPercentage,
-            product.categoryDetails[0]?.productName,
+            product.categoryDetails[0]?.categoryName,
             product.productPurchasePrice,
             product.salePriceDetails[0]?.salePrice1,
             product.salePriceDetails[0]?.salePrice2,
@@ -251,7 +470,7 @@ const StockSearch = () => {
                                         <td className="px-1 py-1">{product.productPack}</td>
                                         <td className="px-1 py-1">{product.companyDetails[0]?.companyName}</td>
                                         <td className="px-1 py-1">{product.vendorSupplierDetails[0]?.supplierName || product.vendorCompanyDetails[0]?.companyName}</td>
-                                        <td className="px-1 py-1">{product.categoryDetails[0]?.productName}</td>
+                                        <td className="px-1 py-1">{product.categoryDetails[0]?.categoryName}</td>
                                         <td className="px-1 py-1">{product.salePriceDetails[0]?.salePrice1}</td>
                                         <td className="px-1 py-1">{Math.ceil(product.productTotalQuantity / product.productPack)}</td>
                                         <td className="px-1 py-1">{Math.ceil(product.productTotalQuantity)}</td>
@@ -274,6 +493,11 @@ const StockSearch = () => {
                         </table>
                     </div>
                 }
+                {currentProducts && currentProducts.length === 0 && (
+                    <div className="text-center py-4 text-gray-500">
+                        No products found
+                    </div>
+                )}
                 <div className="flex justify-center gap-3 mt-2 text-xs">
                     <button
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -281,7 +505,7 @@ const StockSearch = () => {
                         className="px-2 py-1 border rounded hover:bg-gray-200"
                     >Previous</button>
                     <span className="self-center">
-                        Page {currentPage} of {Math.ceil(filteredProducts.length / itemsPerPage)}
+                        Page {currentPage} of {Math.ceil(filteredProducts.length / itemsPerPage) || 1}
                     </span>
                     <button
                         onClick={() =>

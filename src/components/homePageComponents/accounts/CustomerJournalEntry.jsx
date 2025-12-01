@@ -1,13 +1,57 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import config from '../../../features/config'; // Import your config
-import Button from '../../Button'; // Import your Button component
+import config from '../../../features/config';
+import Button from '../../Button';
 import ErrorResponseMessage from '../../ErrorResponseMessage';
 import SuccessResponseMessage from '../../SuccessResponseMessage';
 import Loader from '../../../pages/Loader';
 import { extractErrorMessage } from '../../../utils/extractErrorMessage';
 
 const CustomerJournalEntry = () => {
+    // Dummy Customer Accounts Data
+    const dummyCustomerAccounts = [
+        {
+            _id: "cust_001",
+            individualAccountName: "ABC Corp",
+            customerId: "cust_001",
+        },
+        {
+            _id: "cust_002",
+            individualAccountName: "XYZ Ltd",
+            customerId: "cust_002",
+        },
+        {
+            _id: "cust_003",
+            individualAccountName: "Tech Solutions",
+            customerId: "cust_003",
+        },
+        {
+            _id: "cust_004",
+            individualAccountName: "New Customer A",
+            customerId: "cust_004",
+        },
+        {
+            _id: "cust_005",
+            individualAccountName: "New Customer B",
+            customerId: "cust_005",
+        },
+        {
+            _id: "cust_006",
+            individualAccountName: "Global Enterprises",
+            customerId: "cust_006",
+        },
+        {
+            _id: "cust_007",
+            individualAccountName: "Prime Solutions Inc",
+            customerId: "cust_007",
+        },
+        {
+            _id: "cust_008",
+            individualAccountName: "Outstanding Client A",
+            customerId: "cust_008",
+        },
+    ];
+
     const [customerAccounts, setCustomerAccounts] = useState([]);
     const [formData, setFormData] = useState({
         customerAccountId: '',
@@ -20,31 +64,16 @@ const CustomerJournalEntry = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const fetchVendorAccounts = async () => {
+        const fetchCustomerAccounts = async () => {
             try {
                 setLoading(true);
-                const response = await config.getAccounts(); // Your API call
-                if (response.data) {
-                    // Extract Vendor accounts
-                    const extractedVendorAccounts = response.data.filter(account => account.accountName === "Asset");
-                    
-                    if (extractedVendorAccounts.length > 0) {
-                        const accountCategories = extractedVendorAccounts[0].subCategories.filter((subCategory) => subCategory.accountSubCategoryName === "Current Asset");
-                        
-
-                        const accounts = accountCategories[0].individualAccounts.filter((account) => (
-                            account.customerId ||
-                            account.customerId !== null 
-                        ))
-                        
-
-                        setCustomerAccounts(accounts);
-                    } else {
-                        setError("No Customer Accounts Found");
-                    }
-                } else {
-                    setError("No Customer Accounts Found");
-                }
+                
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 500))
+                
+                // Use dummy data instead of API call
+                setCustomerAccounts(dummyCustomerAccounts);
+                
             } catch (err) {
                 console.error("Error fetching customer accounts:", err);
                 const errorMessage = extractErrorMessage(err);
@@ -54,7 +83,7 @@ const CustomerJournalEntry = () => {
             }
         };
 
-        fetchVendorAccounts();
+        fetchCustomerAccounts();
     }, []);
 
     const handleChange = (e) => {
@@ -67,9 +96,38 @@ const CustomerJournalEntry = () => {
         setError(null);
         setSuccess(null);
         console.log('formData', formData)
+        
         try {
-            const response = await config.postCustomerJournalEntry(formData); 
-            if (response) {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            // Validate form data
+            if (!formData.customerAccountId || !formData.amount) {
+                setError("Customer Account and Amount are required");
+                setLoading(false);
+                return;
+            }
+
+            // Find the selected customer account
+            const selectedCustomer = dummyCustomerAccounts.find(acc => acc._id === formData.customerAccountId);
+            
+            // Create dummy response object
+            const dummyResponse = {
+                data: {
+                    _id: `customer_entry_${Date.now()}`,
+                    customerAccountId: formData.customerAccountId,
+                    customerAccountName: selectedCustomer?.individualAccountName,
+                    amount: parseFloat(formData.amount),
+                    description: formData.description,
+                    details: formData.details,
+                    createdAt: new Date().toISOString(),
+                    status: "recorded",
+                    credit: parseFloat(formData.amount)
+                },
+                message: "Customer journal entry recorded successfully!"
+            };
+
+            if (dummyResponse.data) {
                 setSuccess("Customer journal entry recorded successfully!");
                 setFormData({
                     customerAccountId: '',
@@ -78,7 +136,7 @@ const CustomerJournalEntry = () => {
                     details: '',
                 });
             } else {
-                setError(response.message || "Failed to record customer journal entry.");
+                setError(dummyResponse.message || "Failed to record customer journal entry.");
             }
         } catch (err) {
             console.error("Error recording customer journal entry:", err);
@@ -90,7 +148,7 @@ const CustomerJournalEntry = () => {
     };
 
     return loading ? (
-        <Loader h_w="h-16 w-16 border-b-4 border-t-4" message="Loading Vendor Accounts..." />
+        <Loader h_w="h-16 w-16 border-b-4 border-t-4" message="Loading Customer Accounts..." />
     ) : (
         <div className="p-4 bg-white border rounded shadow-md">
             <h2 className="text-xl font-bold mb-4">Customer Journal Entry</h2>

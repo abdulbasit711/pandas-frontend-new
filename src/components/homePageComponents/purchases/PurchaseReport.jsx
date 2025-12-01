@@ -10,6 +10,200 @@ import ViewPurchase from "./ViewPurchase";
 
 const ITEMS_PER_PAGE = 200;
 
+// --- Dummy Purchase Data ---
+const dummyPurchaseData = [
+  {
+    _id: "pur_001",
+    purchaseBillNo: "PUR-0001",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 50,
+    flatDiscount: 1000,
+    totalAmount: 95000,
+    paidAmount: 95000,
+    vendorSupplierId: {
+      _id: "sup_001",
+      supplierName: "Direct Import Co"
+    },
+    vendorCompanyId: null,
+    purchaseItems: [
+      {
+        productId: "prod_001",
+        quantity: 50,
+        discount: 0,
+        pricePerUnit: 1900
+      }
+    ]
+  },
+  {
+    _id: "pur_002",
+    purchaseBillNo: "PUR-0002",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 75,
+    flatDiscount: 1500,
+    totalAmount: 142500,
+    paidAmount: 71250,
+    vendorSupplierId: null,
+    vendorCompanyId: {
+      _id: "comp_001",
+      companyName: "TechCorp Supply"
+    },
+    purchaseItems: [
+      {
+        productId: "prod_002",
+        quantity: 75,
+        discount: 5,
+        pricePerUnit: 1900
+      }
+    ]
+  },
+  {
+    _id: "pur_003",
+    purchaseBillNo: "PUR-0003",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 30,
+    flatDiscount: 800,
+    totalAmount: 58200,
+    paidAmount: 58200,
+    vendorSupplierId: {
+      _id: "sup_002",
+      supplierName: "Wholesale Hub"
+    },
+    vendorCompanyId: null,
+    purchaseItems: [
+      {
+        productId: "prod_003",
+        quantity: 30,
+        discount: 0,
+        pricePerUnit: 1940
+      }
+    ]
+  },
+  {
+    _id: "pur_004",
+    purchaseBillNo: "PUR-0004",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 100,
+    flatDiscount: 2000,
+    totalAmount: 190000,
+    paidAmount: 0,
+    vendorSupplierId: null,
+    vendorCompanyId: {
+      _id: "comp_002",
+      companyName: "Global Traders Ltd"
+    },
+    purchaseItems: [
+      {
+        productId: "prod_004",
+        quantity: 100,
+        discount: 0,
+        pricePerUnit: 1920
+      }
+    ]
+  },
+  {
+    _id: "pur_005",
+    purchaseBillNo: "PUR-0005",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 45,
+    flatDiscount: 1200,
+    totalAmount: 86400,
+    paidAmount: 43200,
+    vendorSupplierId: {
+      _id: "sup_003",
+      supplierName: "Bulk Suppliers Inc"
+    },
+    vendorCompanyId: null,
+    purchaseItems: [
+      {
+        productId: "prod_005",
+        quantity: 45,
+        discount: 0,
+        pricePerUnit: 1920
+      }
+    ]
+  },
+  {
+    _id: "pur_006",
+    purchaseBillNo: "PUR-0006",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 60,
+    flatDiscount: 1500,
+    totalAmount: 114000,
+    paidAmount: 114000,
+    vendorSupplierId: null,
+    vendorCompanyId: {
+      _id: "comp_003",
+      companyName: "Premium Electronics"
+    },
+    purchaseItems: [
+      {
+        productId: "prod_006",
+        quantity: 60,
+        discount: 0,
+        pricePerUnit: 1900
+      }
+    ]
+  },
+  {
+    _id: "pur_007",
+    purchaseBillNo: "PUR-0007",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 80,
+    flatDiscount: 1800,
+    totalAmount: 152000,
+    paidAmount: 76000,
+    vendorSupplierId: {
+      _id: "sup_001",
+      supplierName: "Direct Import Co"
+    },
+    vendorCompanyId: null,
+    purchaseItems: [
+      {
+        productId: "prod_007",
+        quantity: 80,
+        discount: 0,
+        pricePerUnit: 1900
+      }
+    ]
+  },
+  {
+    _id: "pur_008",
+    purchaseBillNo: "PUR-0008",
+    purchaseDate: new Date().toISOString(),
+    totalQuantity: 55,
+    flatDiscount: 1400,
+    totalAmount: 104500,
+    paidAmount: 104500,
+    vendorSupplierId: null,
+    vendorCompanyId: {
+      _id: "comp_001",
+      companyName: "TechCorp Supply"
+    },
+    purchaseItems: [
+      {
+        productId: "prod_008",
+        quantity: 55,
+        discount: 0,
+        pricePerUnit: 1900
+      }
+    ]
+  },
+];
+
+// --- Dummy Suppliers Data ---
+const dummySuppliers = [
+  { _id: "sup_001", supplierName: "Direct Import Co" },
+  { _id: "sup_002", supplierName: "Wholesale Hub" },
+  { _id: "sup_003", supplierName: "Bulk Suppliers Inc" },
+];
+
+// --- Dummy Companies Data ---
+const dummyCompanies = [
+  { _id: "comp_001", companyName: "TechCorp Supply" },
+  { _id: "comp_002", companyName: "Global Traders Ltd" },
+  { _id: "comp_003", companyName: "Premium Electronics" },
+];
+
 function PurchaseReport() {
   const [totalPurchases, setTotalPurchases] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
@@ -31,8 +225,8 @@ function PurchaseReport() {
 
   const { primaryPath } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const supplierData = useSelector((state) => state.suppliers.supplierData);
-  const companyData = useSelector((state) => state.companies.companyData);
+  const supplierData = useSelector((state) => state.suppliers.supplierData) || dummySuppliers;
+  const companyData = useSelector((state) => state.companies.companyData) || dummyCompanies;
   const purchaseData = useSelector((state) => state.purchaseItem.purchaseData);
   const navigate = useNavigate();
 
@@ -40,9 +234,13 @@ function PurchaseReport() {
     fetchAllPurchases();
   }, []);
 
+  // --- Dummy Data Fetcher (Replaces API call) ---
   const fetchAllPurchases = async () => {
     try {
       setIsLoading(true);
+
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const start = new Date(filters.startDate);
       start.setHours(0, 0, 0, 0);
@@ -50,19 +248,22 @@ function PurchaseReport() {
       const end = new Date(filters.endDate);
       end.setHours(23, 59, 59, 999);
 
-      const query = {
-        ...filters,
-        startDate: start.toISOString(),
-        endDate: end.toISOString(),
-        status: filters.status.join(","),
-      };
+      // Filter dummy data based on criteria
+      let filteredPurchases = dummyPurchaseData.filter((purchase) => {
+        const purchaseDate = new Date(purchase.purchaseDate);
+        const dateInRange = purchaseDate >= start && purchaseDate <= end;
 
-      const response = await config.fetchAllPurchases(query);
+        const vendorSupplierMatch = !filters.vendorSupplierId || 
+                                   purchase.vendorSupplierId?._id === filters.vendorSupplierId;
 
-      if (response) {
-        dispatch(setPurchaseData(response.data));
-        calculateTotals(response.data);
-      }
+        const vendorCompanyMatch = !filters.vendorCompanyId || 
+                                  purchase.vendorCompanyId?._id === filters.vendorCompanyId;
+
+        return dateInRange && vendorSupplierMatch && vendorCompanyMatch;
+      });
+
+      dispatch(setPurchaseData(filteredPurchases));
+      calculateTotals(filteredPurchases);
     } catch (error) {
       console.error("Error fetching purchases:", error);
     } finally {
@@ -180,7 +381,7 @@ function PurchaseReport() {
             }
           >
             <option value="">Select Supplier</option>
-            {supplierData?.map((vendor, index) => (
+            {dummySuppliers?.map((vendor, index) => (
               <option key={index} value={vendor._id}>
                 {vendor.supplierName}
               </option>
@@ -202,7 +403,7 @@ function PurchaseReport() {
             }
           >
             <option value="">Select Company</option>
-            {companyData?.map((vendor, index) => (
+            {dummyCompanies?.map((vendor, index) => (
               <option key={index} value={vendor._id}>
                 {vendor.companyName}
               </option>

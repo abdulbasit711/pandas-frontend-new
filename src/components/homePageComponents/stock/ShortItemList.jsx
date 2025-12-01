@@ -3,11 +3,105 @@ import { useSelector } from "react-redux";
 import { saveAs } from 'file-saver';
 
 const ShortItemList = () => {
-  const allProducts = useSelector((state) => state.saleItems.allProducts);
+  // Dummy Products with low/critical/out of stock
+  const dummyLowStockProducts = [
+    {
+      _id: "prod_low_001",
+      productName: "Pepsi 500ml",
+      productCode: "PEP500",
+      productPack: 1,
+      productTotalQuantity: 0,
+      typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+      companyDetails: [{ _id: "comp_001", companyName: "PepsiCo" }],
+    },
+    {
+      _id: "prod_low_002",
+      productName: "Sprite 1L",
+      productCode: "SPR1L",
+      productPack: 1,
+      productTotalQuantity: 2,
+      typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+      companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+    },
+    {
+      _id: "prod_low_003",
+      productName: "Coke 250ml",
+      productCode: "COK250",
+      productPack: 1,
+      productTotalQuantity: 3,
+      typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+      companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+    },
+    {
+      _id: "prod_low_004",
+      productName: "Fanta Orange 1L",
+      productCode: "FAN1LOR",
+      productPack: 1,
+      productTotalQuantity: 5,
+      typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+      companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+    },
+    {
+      _id: "prod_low_005",
+      productName: "Mountain Dew 500ml",
+      productCode: "MDEW500",
+      productPack: 1,
+      productTotalQuantity: 8,
+      typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+      companyDetails: [{ _id: "comp_002", companyName: "Coca-Cola" }],
+    },
+    {
+      _id: "prod_low_006",
+      productName: "7UP 1L",
+      productCode: "7UP1L",
+      productPack: 1,
+      productTotalQuantity: 1,
+      typeDetails: [{ _id: "type_001", typeName: "Beverage" }],
+      companyDetails: [{ _id: "comp_003", companyName: "7UP Inc" }],
+    },
+    {
+      _id: "prod_low_007",
+      productName: "Nestle Water 500ml",
+      productCode: "NSW500",
+      productPack: 2,
+      productTotalQuantity: 4,
+      typeDetails: [{ _id: "type_002", typeName: "Water" }],
+      companyDetails: [{ _id: "comp_004", companyName: "Nestle" }],
+    },
+    {
+      _id: "prod_low_008",
+      productName: "Aquafina Water 1.5L",
+      productCode: "AQU1.5L",
+      productPack: 1,
+      productTotalQuantity: 9,
+      typeDetails: [{ _id: "type_002", typeName: "Water" }],
+      companyDetails: [{ _id: "comp_005", companyName: "Aquafina" }],
+    },
+    {
+      _id: "prod_low_009",
+      productName: "Orange Juice 1L",
+      productCode: "OJ1L",
+      productPack: 1,
+      productTotalQuantity: 2,
+      typeDetails: [{ _id: "type_003", typeName: "Juice" }],
+      companyDetails: [{ _id: "comp_006", companyName: "Tropicana" }],
+    },
+    {
+      _id: "prod_low_010",
+      productName: "Apple Juice 500ml",
+      productCode: "AJ500",
+      productPack: 1,
+      productTotalQuantity: 6,
+      typeDetails: [{ _id: "type_003", typeName: "Juice" }],
+      companyDetails: [{ _id: "comp_007", companyName: "Minute Maid" }],
+    },
+  ];
+
+  const allProducts = dummyLowStockProducts;
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortKey, setSortKey] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(""); // 🆕 Added search term
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 500;
 
   const filteredProducts = useMemo(() => {

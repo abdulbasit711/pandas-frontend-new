@@ -11,12 +11,96 @@ const ExpiryReport = () => {
   const [days, setDays] = useState(30);
   const [error, setError] = useState("");
 
+  // Dummy Expiry Products Data
+  const dummyExpiryProducts = [
+    {
+      _id: "prod_exp_001",
+      productName: "Pepsi 500ml",
+      productExpiryDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_001", companyName: "PepsiCo" },
+      typeId: { _id: "type_001", typeName: "Beverage" },
+    },
+    {
+      _id: "prod_exp_002",
+      productName: "Sprite 1L",
+      productExpiryDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_002", companyName: "Coca-Cola" },
+      typeId: { _id: "type_001", typeName: "Beverage" },
+    },
+    {
+      _id: "prod_exp_003",
+      productName: "Coke 250ml",
+      productExpiryDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_002", companyName: "Coca-Cola" },
+      typeId: { _id: "type_001", typeName: "Beverage" },
+    },
+    {
+      _id: "prod_exp_004",
+      productName: "Fanta Orange 1L",
+      productExpiryDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_002", companyName: "Coca-Cola" },
+      typeId: { _id: "type_001", typeName: "Beverage" },
+    },
+    {
+      _id: "prod_exp_005",
+      productName: "Mountain Dew 500ml",
+      productExpiryDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_002", companyName: "Coca-Cola" },
+      typeId: { _id: "type_001", typeName: "Beverage" },
+    },
+    {
+      _id: "prod_exp_006",
+      productName: "7UP 1L",
+      productExpiryDate: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_003", companyName: "7UP Inc" },
+      typeId: { _id: "type_001", typeName: "Beverage" },
+    },
+    {
+      _id: "prod_exp_007",
+      productName: "Nestle Water 500ml",
+      productExpiryDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_004", companyName: "Nestle" },
+      typeId: { _id: "type_002", typeName: "Water" },
+    },
+    {
+      _id: "prod_exp_008",
+      productName: "Aquafina Water 1.5L",
+      productExpiryDate: new Date(Date.now() + 55 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_005", companyName: "Aquafina" },
+      typeId: { _id: "type_002", typeName: "Water" },
+    },
+    {
+      _id: "prod_exp_009",
+      productName: "Orange Juice 1L",
+      productExpiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_006", companyName: "Tropicana" },
+      typeId: { _id: "type_003", typeName: "Juice" },
+    },
+    {
+      _id: "prod_exp_010",
+      productName: "Apple Juice 500ml",
+      productExpiryDate: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000).toISOString(),
+      companyId: { _id: "comp_007", companyName: "Minute Maid" },
+      typeId: { _id: "type_003", typeName: "Juice" },
+    },
+  ];
+
   const fetchExpiryReport = async () => {
     try {
-      const response = await config.getExpiryReport(days)
-      console.log('response', response)
-      setProducts(response.data);
-      setFilteredProducts(response.data);
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Filter products expiring within specified days
+      const now = new Date();
+      const futureDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+      
+      const filtered = dummyExpiryProducts.filter((product) => {
+        const expiryDate = new Date(product.productExpiryDate);
+        return expiryDate >= now && expiryDate <= futureDate;
+      });
+
+      setProducts(filtered);
+      setFilteredProducts(filtered);
       setError("");
     } catch (err) {
       console.error(err);
@@ -79,7 +163,7 @@ const ExpiryReport = () => {
         />
         <select
           value={days}
-          onChange={(e) => setDays(e.target.value)}
+          onChange={(e) => setDays(parseInt(e.target.value))}
           className="border px-3 py-1 rounded text-sm"
         >
           <option value={7}>Next 7 Days</option>

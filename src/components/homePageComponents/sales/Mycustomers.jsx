@@ -11,7 +11,123 @@ import ButtonLoader from '../../ButtonLoader';
 import { extractErrorMessage } from '../../../utils/extractErrorMessage';
 import SuccessResponseMessage from '../../SuccessResponseMessage';
 
-const ITEMS_PER_PAGE = 200; // Adjust as needed
+const ITEMS_PER_PAGE = 200;
+
+// --- Dummy Customers Data ---
+const dummyCustomersData = [
+  {
+    _id: "cust_001",
+    customerName: "Ahmed Enterprises",
+    mobileNo: "03001234567",
+    phoneNo: "051-1234567",
+    faxNo: "051-1234568",
+    email: "ahmed@enterprise.com",
+    cnic: "12345-6789123-4",
+    ntnNumber: "1234567",
+    customerRegion: "Islamabad",
+    customerFlag: "red",
+    createdAt: new Date(2024, 0, 5).toISOString(),
+    totalRemainingPayableAmount: 45000
+  },
+  {
+    _id: "cust_002",
+    customerName: "Blue Sky Trading",
+    mobileNo: "03109876543",
+    phoneNo: "021-2345678",
+    faxNo: "021-2345679",
+    email: "bluesky@trading.com",
+    cnic: "98765-4321098-7",
+    ntnNumber: "7654321",
+    customerRegion: "Karachi",
+    customerFlag: "green",
+    createdAt: new Date(2024, 0, 10).toISOString(),
+    totalRemainingPayableAmount: 12500
+  },
+  {
+    _id: "cust_003",
+    customerName: "Tech Solutions Ltd",
+    mobileNo: "03214567890",
+    phoneNo: "042-5678901",
+    faxNo: "042-5678902",
+    email: "tech@solutions.com",
+    cnic: "55555-5555555-5",
+    ntnNumber: "5555555",
+    customerRegion: "Lahore",
+    customerFlag: "yellow",
+    createdAt: new Date(2024, 0, 15).toISOString(),
+    totalRemainingPayableAmount: 68000
+  },
+  {
+    _id: "cust_004",
+    customerName: "General Store",
+    mobileNo: "03008765432",
+    phoneNo: "061-9876543",
+    faxNo: "061-9876544",
+    email: "general@store.com",
+    cnic: "11111-1111111-1",
+    ntnNumber: "1111111",
+    customerRegion: "Rawalpindi",
+    customerFlag: "white",
+    createdAt: new Date(2024, 0, 20).toISOString(),
+    totalRemainingPayableAmount: 35000
+  },
+  {
+    _id: "cust_005",
+    customerName: "City Mart",
+    mobileNo: "03123456789",
+    phoneNo: "031-3456789",
+    faxNo: "031-3456790",
+    email: "city@mart.com",
+    cnic: "22222-2222222-2",
+    ntnNumber: "2222222",
+    customerRegion: "Peshawar",
+    customerFlag: "red",
+    createdAt: new Date(2024, 0, 25).toISOString(),
+    totalRemainingPayableAmount: 52000
+  },
+  {
+    _id: "cust_006",
+    customerName: "Premium Supplies",
+    mobileNo: "03334567890",
+    phoneNo: "033-4567890",
+    faxNo: "033-4567891",
+    email: "premium@supplies.com",
+    cnic: "33333-3333333-3",
+    ntnNumber: "3333333",
+    customerRegion: "Quetta",
+    customerFlag: "green",
+    createdAt: new Date(2024, 1, 5).toISOString(),
+    totalRemainingPayableAmount: 88000
+  },
+  {
+    _id: "cust_007",
+    customerName: "Global Traders",
+    mobileNo: "03006789012",
+    phoneNo: "041-6789012",
+    faxNo: "041-6789013",
+    email: "global@traders.com",
+    cnic: "44444-4444444-4",
+    ntnNumber: "4444444",
+    customerRegion: "Faisalabad",
+    customerFlag: "yellow",
+    createdAt: new Date(2024, 1, 10).toISOString(),
+    totalRemainingPayableAmount: 42000
+  },
+  {
+    _id: "cust_008",
+    customerName: "Bright Business Co",
+    mobileNo: "03119012345",
+    phoneNo: "051-9012345",
+    faxNo: "051-9012346",
+    email: "bright@business.com",
+    cnic: "66666-6666666-6",
+    ntnNumber: "6666666",
+    customerRegion: "Islamabad",
+    customerFlag: "white",
+    createdAt: new Date(2024, 1, 15).toISOString(),
+    totalRemainingPayableAmount: 78000
+  },
+];
 
 function Mycustomers() {
 
@@ -30,7 +146,7 @@ function Mycustomers() {
   
   const [isCustomerCreated, setIsCustomerCreated] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -57,24 +173,24 @@ function Mycustomers() {
     formState: { errors },
   } = useForm();
 
-  // const customerData = useSelector(state => state.customers.customerData)
   const dispatch = useDispatch()
-  // console.log(customerData)
 
+  // --- Dummy Data Fetcher (Replaces API call) ---
   const fetchCustomers = async () => {
     setError('')
     try {
-      const data = await config.fetchAllCustomers()
-      if (data) {
-        setNewCustomerData(data.data)
-        dispatch(setCustomerData(data.data));
-      }
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setNewCustomerData(dummyCustomersData);
+      dispatch(setCustomerData(dummyCustomersData));
       setIsLoading(false)
     } catch (error) {
       setError(error.message)
     }
   }
 
+  // --- Dummy Delete Handler (Replaces API call) ---
   const handleDeleteCustomer = async (customerId, customerName) => {
     setError('')
     setSuccessMessage('')
@@ -87,17 +203,21 @@ function Mycustomers() {
     setIsDeleteLoading(true)
 
     try {
-      // console.log('customerId', customerId)
-      const data = await config.deleteCustomer(customerId)
-      console.log('data', data)
-      if (data.success) {
-        fetchCustomers()
-        setSuccessMessage(data?.message)
-        setShowSuccessMessage(true)
-      }
-      setIsDeleteLoading(false)
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Remove customer from dummy data
+      const updatedCustomers = newCustomerData.filter(c => c._id !== customerId);
+      setNewCustomerData(updatedCustomers);
+      dispatch(setCustomerData(updatedCustomers));
+      
+      setSuccessMessage(`Customer "${customerName}" deleted successfully!`)
+      setShowSuccessMessage(true)
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setShowSuccessMessage(false), 3000);
     } catch (error) {
-      const msg = extractErrorMessage(error)
+      const msg = extractErrorMessage(error) || 'Error deleting customer'
       setDeleteMessage(msg)
       setShowDeleteMessage(true)
     } finally {
@@ -110,7 +230,6 @@ function Mycustomers() {
     setIsEdit(true);
     setCustomerName(customer.customerName);
 
-    // pre-fill all fields in form
     reset({
       customerId: customer._id,
       customerName: customer.customerName || "",
@@ -125,7 +244,6 @@ function Mycustomers() {
     });
   };
 
-
   const getDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -133,41 +251,51 @@ function Mycustomers() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-
     });
   }
 
+  // --- Dummy Update Handler (Replaces API call) ---
   const handleUpdateCustomer = async (data) => {
-    console.log(data);
     setIsLoading(true)
-
-    console.log("Raw Data:", data);
 
     // Filter out empty string values
     const cleanedData = Object.fromEntries(
       Object.entries(data).filter(([_, value]) => value !== "")
     );
 
-    console.log("Cleaned Data:", cleanedData);
-
     try {
-      const response = await config.updateCustomer(cleanedData);
-      if (response) {
-        setSuccessMessage(response.message)
-        console.log("comp res: ", response.message)
-        setIsLoading(false)
-        setIsCustomerCreated(true)
-        reset()
-      }
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Update customer in dummy data
+      const updatedCustomers = newCustomerData.map(c => 
+        c._id === customerId 
+          ? { ...c, ...cleanedData }
+          : c
+      );
+      
+      setNewCustomerData(updatedCustomers);
+      dispatch(setCustomerData(updatedCustomers));
+      
+      setSuccessMessage(`Customer "${cleanedData.customerName || customerName}" updated successfully!`)
+      setIsLoading(false)
+      setIsCustomerCreated(true)
+      reset()
+      
+      // Auto close success modal and edit view after 2 seconds
+      setTimeout(() => {
+        setIsCustomerCreated(false);
+        setIsEdit(false);
+      }, 2000);
     } catch (error) {
-      console.log("error updating customer:", error)
+      setError('Error updating customer')
+      setIsLoading(false)
     }
   };
 
-
   useEffect(() => {
     fetchCustomers()
-  }, [isEdit])
+  }, [])
 
   return !isEdit ? (!isLoading ? (
     <div className='bg-white rounded-lg'>
@@ -212,7 +340,6 @@ function Mycustomers() {
               <th className="py-2 px-1 text-left">S No.</th>
               <th className="py-2 px-1 text-left">Customer Name</th>
               <th className="py-2 px-1 text-left">Mobile No</th>
-              {/* <th className="py-2 px-1 text-left">Last Order</th> */}
               <th className="py-2 px-1 text-left">Customer Region</th>
               <th className="py-2 px-1 text-left">Customer flag</th>
               <th className="py-2 px-1 text-left">Created at</th>
@@ -225,11 +352,9 @@ function Mycustomers() {
                 <td className="py-1 px-2">{index + 1}</td>
                 <td className="py-1 px-2">{customer.customerName}</td>
                 <td className="py-1 px-2">{customer.mobileNo}</td>
-                {/* <td className="py-1 px-2">25/3/2024</td> */}
                 <td className="py-1 px-2">{customer.customerRegion}</td>
                 <td className="py-1 px-2">{customer.customerFlag}<span className={`h-10 w-20  bg-${customer.customerFlag}-500`}></span></td>
-                <td className="py-1 px-2">{customer.createdAt && customer.createdAt &&
-                  getDate(customer.createdAt)}</td>
+                <td className="py-1 px-2">{customer.createdAt && getDate(customer.createdAt)}</td>
                 <td className="py-1 px-2 flex gap-2">
                   <button
                     className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded-full"
@@ -347,7 +472,6 @@ function Mycustomers() {
               />
             </div>
 
-
             <div className="flex items-center">
               <label className="w-40">Email:</label>
               <input
@@ -378,19 +502,17 @@ function Mycustomers() {
               <label className="w-40">Customer Flag:</label>
               <select
                 {...register('customerFlag')}
-                className={`border p-1  rounded w-full`}
+                className={`border p-1 rounded w-full`}
               >
-                {/* <option value="">Select Flag</option> */}
                 <option className='bg-red-500 text-white text-center' value="red">Red</option>
                 <option className='bg-green-500 text-white text-center' value="green">Green</option>
                 <option className='bg-yellow-500 text-center text-white' value="yellow">Yellow</option>
-                <option className='bg-white  text-center' value="white">White</option>
+                <option className='bg-white text-center' value="white">White</option>
               </select>
             </div>
           </div>
 
           <div className="mt-4 w-full flex justify-center">
-
             <div
               className="w-full flex justify-center pt-4"
               disabled={isLoading}
@@ -403,18 +525,14 @@ function Mycustomers() {
               ) : (
                 <Button
                   type="submit"
-                  className={`px-24 `}
+                  className={`px-24`}
                 >Update Customer</Button>
-
               )}
             </div>
-
           </div>
         </form>
       </div>
     </div>
-
-
 }
 
 export default Mycustomers

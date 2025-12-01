@@ -19,6 +19,105 @@ function MySuppliers() {
   const [isSupplierCreated, setIsSupplierCreated] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
 
+  // Dummy Suppliers Data
+  const dummySuppliersData = [
+    {
+      _id: "sup_001",
+      supplierName: "Direct Import Co",
+      mobileNo: "+92-321-9876543",
+      phoneNo: "021-12345678",
+      email: "import@direct.com",
+      faxNo: "021-12345679",
+      cnic: "12345-6789012-3",
+      supplierRegion: "Karachi",
+      customerFlag: "green",
+      createdAt: new Date(2024, 0, 10).toISOString(),
+    },
+    {
+      _id: "sup_002",
+      supplierName: "wholesale Hub",
+      mobileNo: "+92-300-8765432",
+      phoneNo: "021-23456789",
+      email: "wholesale@hub.com",
+      faxNo: "021-23456790",
+      cnic: "23456-7890123-4",
+      supplierRegion: "Lahore",
+      customerFlag: "green",
+      createdAt: new Date(2024, 0, 15).toISOString(),
+    },
+    {
+      _id: "sup_003",
+      supplierName: "Premium Suppliers",
+      mobileNo: "+92-333-7654321",
+      phoneNo: "051-34567890",
+      email: "premium@suppliers.com",
+      faxNo: "051-34567891",
+      cnic: "34567-8901234-5",
+      supplierRegion: "Islamabad",
+      customerFlag: "yellow",
+      createdAt: new Date(2024, 0, 20).toISOString(),
+    },
+    {
+      _id: "sup_004",
+      supplierName: "Bulk Trading Ltd",
+      mobileNo: "+92-345-6543210",
+      phoneNo: "021-45678901",
+      email: "bulk@trading.com",
+      faxNo: "021-45678902",
+      cnic: "45678-9012345-6",
+      supplierRegion: "Karachi",
+      customerFlag: "red",
+      createdAt: new Date(2024, 1, 5).toISOString(),
+    },
+    {
+      _id: "sup_005",
+      supplierName: "Quality Wholesale",
+      mobileNo: "+92-334-5432109",
+      phoneNo: "042-56789012",
+      email: "quality@wholesale.com",
+      faxNo: "042-56789013",
+      cnic: "56789-0123456-7",
+      supplierRegion: "Multan",
+      customerFlag: "green",
+      createdAt: new Date(2024, 1, 10).toISOString(),
+    },
+    {
+      _id: "sup_006",
+      supplierName: "Standard Imports",
+      mobileNo: "+92-315-4321098",
+      phoneNo: "061-67890123",
+      email: "standard@imports.com",
+      faxNo: "061-67890124",
+      cnic: "67890-1234567-8",
+      supplierRegion: "Peshawar",
+      customerFlag: "white",
+      createdAt: new Date(2024, 1, 15).toISOString(),
+    },
+    {
+      _id: "sup_007",
+      supplierName: "Trade Partners Inc",
+      mobileNo: "+92-322-3210987",
+      phoneNo: "021-78901234",
+      email: "partners@trade.com",
+      faxNo: "021-78901235",
+      cnic: "78901-2345678-9",
+      supplierRegion: "Karachi",
+      customerFlag: "yellow",
+      createdAt: new Date(2024, 2, 5).toISOString(),
+    },
+    {
+      _id: "sup_008",
+      supplierName: "Global Distribution",
+      mobileNo: "+92-346-2109876",
+      phoneNo: "031-89012345",
+      email: "global@distribution.com",
+      faxNo: "031-89012346",
+      cnic: "89012-3456789-0",
+      supplierRegion: "Hyderabad",
+      customerFlag: "green",
+      createdAt: new Date(2024, 2, 10).toISOString(),
+    },
+  ];
 
   const {
     register,
@@ -33,12 +132,13 @@ function MySuppliers() {
 
   const fetchSuppliers = async () => {
     setError('')
+    setIsLoading(true)
     try {
-      const data = await config.fetchAllSuppliers()
-      if (data) {
-        setNewSupplierData(data.data)
-        dispatch(setSupplierData(data.data));
-      }
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      setNewSupplierData(dummySuppliersData)
+      dispatch(setSupplierData(dummySuppliersData));
       setIsLoading(false)
     } catch (error) {
       setError(error.message)
@@ -69,16 +169,27 @@ function MySuppliers() {
     console.log("Cleaned Data:", cleanedData);
 
     try {
-      const response = await config.updateSupplier(cleanedData);
-      if (response) {
-        setSuccessMessage(response.message)
-        console.log("comp res: ", response.message)
-        setIsLoading(false)
-        setIsSupplierCreated(true)
-        reset()
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Find and update the supplier in dummy data
+      const supplierIndex = dummySuppliersData.findIndex(sup => sup._id === data.supplierId);
+      if (supplierIndex !== -1) {
+        dummySuppliersData[supplierIndex] = {
+          ...dummySuppliersData[supplierIndex],
+          ...cleanedData,
+        };
       }
+
+      setNewSupplierData([...dummySuppliersData]);
+      dispatch(setSupplierData([...dummySuppliersData]));
+      setSuccessMessage("Supplier updated successfully")
+      setIsLoading(false)
+      setIsSupplierCreated(true)
+      reset()
     } catch (error) {
       console.log("error updating supplier:", error)
+      setError("Failed to update supplier")
     }
   };
 

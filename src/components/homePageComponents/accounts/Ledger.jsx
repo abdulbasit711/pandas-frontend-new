@@ -11,6 +11,220 @@ import JournalEntryModal from "./JournalEntryModal.jsx";
 
 import { refreshLedgerData } from "../../../utils/refreshLedger.js";
 
+// Dummy accounts hierarchy data
+const dummyAccountsHierarchy = [
+  {
+    _id: 'acc_001',
+    accountName: 'Assets',
+    subCategories: [
+      {
+        _id: 'sub_001',
+        accountSubCategoryName: 'Current Assets',
+        individualAccounts: [
+          { _id: 'ind_001', individualAccountName: 'Cash in Hand', accountBalance: 150000, customerId: null, supplierId: null, companyId: null },
+          { _id: 'ind_002', individualAccountName: 'Bank Account - Primary', accountBalance: 500000, customerId: null, supplierId: null, companyId: null },
+          { _id: 'ind_003', individualAccountName: 'Accounts Receivable', accountBalance: 200000, customerId: 'cust_001', supplierId: null, companyId: null },
+        ]
+      },
+      {
+        _id: 'sub_002',
+        accountSubCategoryName: 'Fixed Assets',
+        individualAccounts: [
+          { _id: 'ind_004', individualAccountName: 'Building', accountBalance: 1000000, customerId: null, supplierId: null, companyId: null },
+          { _id: 'ind_005', individualAccountName: 'Equipment', accountBalance: 300000, customerId: null, supplierId: null, companyId: null },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_002',
+    accountName: 'Liabilities',
+    subCategories: [
+      {
+        _id: 'sub_003',
+        accountSubCategoryName: 'Current Liabilities',
+        individualAccounts: [
+          { _id: 'ind_006', individualAccountName: 'Accounts Payable', accountBalance: 100000, customerId: null, supplierId: 'sup_001', companyId: null },
+          { _id: 'ind_007', individualAccountName: 'Short-term Loan', accountBalance: 50000, customerId: null, supplierId: null, companyId: null },
+        ]
+      },
+      {
+        _id: 'sub_004',
+        accountSubCategoryName: 'Long-term Liabilities',
+        individualAccounts: [
+          { _id: 'ind_008', individualAccountName: 'Long-term Loan', accountBalance: 500000, customerId: null, supplierId: null, companyId: 'comp_001' },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_003',
+    accountName: 'Equity',
+    subCategories: [
+      {
+        _id: 'sub_005',
+        accountSubCategoryName: 'Capital',
+        individualAccounts: [
+          { _id: 'ind_009', individualAccountName: 'Paid-up Capital', accountBalance: 1000000, customerId: null, supplierId: null, companyId: null },
+          { _id: 'ind_010', individualAccountName: 'Retained Earnings', accountBalance: 350000, customerId: null, supplierId: null, companyId: null },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_004',
+    accountName: 'Revenue',
+    subCategories: [
+      {
+        _id: 'sub_006',
+        accountSubCategoryName: 'Sales Revenue',
+        individualAccounts: [
+          { _id: 'ind_011', individualAccountName: 'Direct Sales', accountBalance: 750000, customerId: 'cust_001', supplierId: null, companyId: null },
+          { _id: 'ind_012', individualAccountName: 'Sales Revenue', accountBalance: 450000, customerId: null, supplierId: null, companyId: null },
+        ]
+      }
+    ]
+  },
+  {
+    _id: 'acc_005',
+    accountName: 'Expenses',
+    subCategories: [
+      {
+        _id: 'sub_007',
+        accountSubCategoryName: 'Operating Expenses',
+        individualAccounts: [
+          { _id: 'ind_013', individualAccountName: 'Salary & Wages', accountBalance: 200000, customerId: null, supplierId: null, companyId: null },
+          { _id: 'ind_014', individualAccountName: 'Rent Expense', accountBalance: 50000, customerId: null, supplierId: null, companyId: null },
+        ]
+      }
+    ]
+  }
+];
+
+// Dummy ledger data
+const dummyLedgerData = [
+  {
+    _id: 'entry_001',
+    referenceAccount: { _id: 'ind_001' },
+    individualAccount: { name: 'Cash in Hand' },
+    debit: 150000,
+    credit: 0,
+    details: 'Opening Balance',
+    description: 'Initial cash in hand',
+    createdAt: '2025-12-01T10:00:00Z'
+  },
+  {
+    _id: 'entry_002',
+    referenceAccount: { _id: 'ind_002' },
+    individualAccount: { name: 'Bank Account - Primary' },
+    debit: 500000,
+    credit: 0,
+    details: 'Opening Balance',
+    description: 'Opening bank balance',
+    createdAt: '2025-12-01T10:15:00Z'
+  },
+  {
+    _id: 'entry_003',
+    referenceAccount: { _id: 'ind_001' },
+    individualAccount: { name: 'Cash in Hand' },
+    debit: 0,
+    credit: 50000,
+    details: 'Sales Transaction',
+    description: 'Cash payment received from customer ABC Corp',
+    createdAt: '2025-12-05T14:30:00Z'
+  },
+  {
+    _id: 'entry_004',
+    referenceAccount: { _id: 'ind_002' },
+    individualAccount: { name: 'Bank Account - Primary' },
+    debit: 75000,
+    credit: 0,
+    details: 'Customer Payment',
+    description: 'Cheque received from XYZ Traders',
+    createdAt: '2025-12-06T09:45:00Z'
+  },
+  {
+    _id: 'entry_005',
+    referenceAccount: { _id: 'ind_006' },
+    individualAccount: { name: 'Accounts Payable' },
+    debit: 45000,
+    credit: 0,
+    details: 'Payment to Supplier',
+    description: 'Payment to supplier for goods purchased',
+    createdAt: '2025-12-07T11:20:00Z'
+  },
+  {
+    _id: 'entry_006',
+    referenceAccount: { _id: 'ind_013' },
+    individualAccount: { name: 'Salary & Wages' },
+    debit: 25000,
+    credit: 0,
+    details: 'Salary Payment',
+    description: 'Monthly salary paid to employees',
+    createdAt: '2025-12-08T15:00:00Z'
+  },
+  {
+    _id: 'entry_007',
+    referenceAccount: { _id: 'ind_003' },
+    individualAccount: { name: 'Accounts Receivable' },
+    debit: 120000,
+    credit: 0,
+    details: 'Invoice Issued',
+    description: 'Invoice #INV-2025-001 issued to customer',
+    createdAt: '2025-12-10T10:30:00Z'
+  },
+  {
+    _id: 'entry_008',
+    referenceAccount: { _id: 'ind_001' },
+    individualAccount: { name: 'Cash in Hand' },
+    debit: 85000,
+    credit: 0,
+    details: 'Cash Receipt',
+    description: 'Cash payment against invoice INV-2025-001',
+    createdAt: '2025-12-12T13:45:00Z'
+  },
+  {
+    _id: 'entry_009',
+    referenceAccount: { _id: 'ind_014' },
+    individualAccount: { name: 'Rent Expense' },
+    debit: 15000,
+    credit: 0,
+    details: 'Monthly Rent',
+    description: 'Office rent for December 2025',
+    createdAt: '2025-12-15T09:00:00Z'
+  },
+  {
+    _id: 'entry_010',
+    referenceAccount: { _id: 'ind_002' },
+    individualAccount: { name: 'Bank Account - Primary' },
+    debit: 0,
+    credit: 15000,
+    details: 'Rent Payment',
+    description: 'Bank transfer for monthly rent',
+    createdAt: '2025-12-15T10:00:00Z'
+  },
+  {
+    _id: 'entry_011',
+    referenceAccount: { _id: 'ind_011' },
+    individualAccount: { name: 'Direct Sales' },
+    debit: 200000,
+    credit: 0,
+    details: 'Sales Revenue',
+    description: 'Sales to ABC Corp',
+    createdAt: '2025-12-18T12:00:00Z'
+  },
+  {
+    _id: 'entry_012',
+    referenceAccount: { _id: 'ind_001' },
+    individualAccount: { name: 'Cash in Hand' },
+    debit: 65000,
+    credit: 0,
+    details: 'Cash Sale',
+    description: 'Direct cash sale transaction',
+    createdAt: '2025-12-20T16:30:00Z'
+  },
+];
+
 const Ledger = () => {
   const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -58,25 +272,14 @@ const Ledger = () => {
   const fetchAccountsAndLedger = async () => {
     try {
       setLoading(true);
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Fetch accounts
-      const accountsResponse = await config.getAccounts();
-      if (accountsResponse.data) {
-        setAccounts(accountsResponse.data);
-        setLoading(false);
-
-      } else {
-        setError("No accounts found.");
-      }
-
-      // Fetch General Ledger Data
-      const ledgerResponse = await config.getGeneralLedger();
-      if (ledgerResponse.data) {
-        setLedgerData(ledgerResponse.data);
-      } else {
-        setError("No ledger data found.");
-      }
-      return { accounts: accountsResponse.data, ledger: ledgerResponse.data };
+      // Use dummy data instead of API calls
+      setAccounts(dummyAccountsHierarchy);
+      setLedgerData(dummyLedgerData);
+      
+      return { accounts: dummyAccountsHierarchy, ledger: dummyLedgerData };
     } catch (err) {
       console.error("Error fetching data:", err);
       setError("Failed to load data.");
@@ -87,9 +290,6 @@ const Ledger = () => {
 
   // Fetch accounts and GL data inside the component
   useEffect(() => {
-
-
-
     fetchAccountsAndLedger();
   }, []);
 
@@ -192,51 +392,44 @@ const Ledger = () => {
     setAdjustError(null);
     setAdjustSuccess(null);
 
-
-
     try {
-      const response = await config.openCloseAccountBalance({
-        endpoint: 'adjust-account-balance',
-        formData: {
-          accountId: selectedAccount._id,
-          ...adjustFormData
-        }
-      });
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      if (response?.data) {
-        setAdjustSuccess(response.data.message || "Balance adjusted successfully");
+      // Create dummy response
+      const dummyResponse = {
+        data: {
+          _id: `balance_${Date.now()}`,
+          message: "Balance adjusted successfully"
+        }
+      };
+
+      if (dummyResponse?.data) {
+        setAdjustSuccess(dummyResponse.data.message || "Balance adjusted successfully");
         setTimeout(() => {
           setAdjustSuccess(null)
         }, 3000);
 
-        // await fetchAccountsAndLedger();
-        // setTimeout(() => {
-        //   const updatedAccount = accounts
-        //     .flatMap(acc => acc.subCategories.flatMap(sub => sub.individualAccounts))
-        //     .find(a => a._id === selectedAccount._id);
+        // Add the adjustment to ledger data
+        const newLedgerEntry = {
+          _id: `entry_${Date.now()}`,
+          referenceAccount: { _id: selectedAccount._id },
+          individualAccount: { name: selectedAccount.individualAccountName },
+          debit: parseFloat(adjustFormData.debit) || 0,
+          credit: parseFloat(adjustFormData.credit) || 0,
+          details: 'Balance Adjustment',
+          description: adjustFormData.reason || 'Account balance adjustment',
+          createdAt: new Date().toISOString()
+        };
 
-        //   if (updatedAccount) handleSelectAccount(updatedAccount);
-        // }, 300);
-
-
-        // Inside handleAdjustSubmit
-        await refreshLedgerData({
-          setAccounts,
-          setLedgerData,
-          setSelectedLedgerData,
-          setSelectedAccount,
-          selectedAccount,
-        });
-
-
+        setLedgerData([...ledgerData, newLedgerEntry]);
         setAdjustFormData({ reason: "", debit: 0, credit: 0 });
         setShowAdjustModal(false);
         setAdjustSuccess("Balance adjusted successfully");
         setTimeout(() => setAdjustSuccess(null), 3000);
-
       }
     } catch (err) {
-      setAdjustError(err.response?.data?.message || "Failed to adjust balance");
+      setAdjustError("Failed to adjust balance");
     } finally {
       setAdjustLoading(false);
     }
@@ -525,7 +718,7 @@ const Ledger = () => {
           </div>
 
           <div className="flex flex-col py-7" ref={printRef}>
-            <h1 className="font-sans font-bold">{userData.BusinessId.businessName}</h1>
+            <h1 className="font-sans font-bold">{userData?.BusinessId?.businessName || 'Business Name'}</h1>
             <h2 className=" ">{selectedAccount.individualAccountName} - General Ledger</h2>
 
             {/* Ledger Table */}

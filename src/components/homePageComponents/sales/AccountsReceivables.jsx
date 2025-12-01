@@ -11,6 +11,172 @@ import functions from '../../../features/functions';
 
 const ITEMS_PER_PAGE = 200;
 
+// --- Dummy Account Receivables Data ---
+const dummyReceivablesData = {
+  accountReceivables: [
+    {
+      _id: "rec_001",
+      bill: {
+        _id: "bill_001",
+        billNo: "BILL-0001",
+        createdAt: new Date(2024, 0, 5).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 45000,
+        paidAmount: 15000,
+        flatDiscount: 0,
+        dueDate: new Date(2024, 1, 5).toISOString(),
+        salesPerson: { firstname: "Ahmad", lastname: "Hassan" }
+      },
+      customer: {
+        _id: "cust_001",
+        customerName: "Ahmed Enterprises",
+        customerRegion: "Islamabad"
+      }
+    },
+    {
+      _id: "rec_002",
+      bill: {
+        _id: "bill_002",
+        billNo: "BILL-0002",
+        createdAt: new Date(2024, 0, 6).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 12500,
+        paidAmount: 6250,
+        flatDiscount: 500,
+        dueDate: new Date(2024, 1, 6).toISOString(),
+        salesPerson: { firstname: "Ali", lastname: "Khan" }
+      },
+      customer: {
+        _id: "cust_002",
+        customerName: "Blue Sky Trading",
+        customerRegion: "Karachi"
+      }
+    },
+    {
+      _id: "rec_003",
+      bill: {
+        _id: "bill_003",
+        billNo: "BILL-0003",
+        createdAt: new Date(2024, 0, 7).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 68000,
+        paidAmount: 0,
+        flatDiscount: 2000,
+        dueDate: new Date(2024, 1, 7).toISOString(),
+        salesPerson: { firstname: "Fatima", lastname: "Ahmed" }
+      },
+      customer: {
+        _id: "cust_003",
+        customerName: "Tech Solutions Ltd",
+        customerRegion: "Lahore"
+      }
+    },
+    {
+      _id: "rec_004",
+      bill: {
+        _id: "bill_004",
+        billNo: "BILL-0004",
+        createdAt: new Date(2024, 0, 8).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 35000,
+        paidAmount: 17500,
+        flatDiscount: 1000,
+        dueDate: new Date(2024, 1, 8).toISOString(),
+        salesPerson: { firstname: "Muhammad", lastname: "Rizvi" }
+      },
+      customer: {
+        _id: "cust_004",
+        customerName: "General Store",
+        customerRegion: "Rawalpindi"
+      }
+    },
+    {
+      _id: "rec_005",
+      bill: {
+        _id: "bill_005",
+        billNo: "BILL-0005",
+        createdAt: new Date(2024, 0, 9).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 95000,
+        paidAmount: 0,
+        flatDiscount: 5000,
+        dueDate: new Date(2024, 1, 9).toISOString(),
+        salesPerson: { firstname: "Hassan", lastname: "Malik" }
+      },
+      customer: {
+        _id: "cust_005",
+        customerName: "City Mart",
+        customerRegion: "Peshawar"
+      }
+    },
+    {
+      _id: "rec_006",
+      bill: {
+        _id: "bill_006",
+        billNo: "BILL-0006",
+        createdAt: new Date(2024, 0, 10).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 28000,
+        paidAmount: 14000,
+        flatDiscount: 0,
+        dueDate: new Date(2024, 1, 10).toISOString(),
+        salesPerson: { firstname: "Zara", lastname: "Nasir" }
+      },
+      customer: {
+        _id: "cust_006",
+        customerName: "Premium Supplies",
+        customerRegion: "Quetta"
+      }
+    },
+    {
+      _id: "rec_007",
+      bill: {
+        _id: "bill_007",
+        billNo: "BILL-0007",
+        createdAt: new Date(2024, 0, 11).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 52000,
+        paidAmount: 0,
+        flatDiscount: 1500,
+        dueDate: new Date(2024, 1, 11).toISOString(),
+        salesPerson: { firstname: "Salman", lastname: "Farooq" }
+      },
+      customer: {
+        _id: "cust_007",
+        customerName: "Global Traders",
+        customerRegion: "Faisalabad"
+      }
+    },
+    {
+      _id: "rec_008",
+      bill: {
+        _id: "bill_008",
+        billNo: "BILL-0008",
+        createdAt: new Date(2024, 0, 12).toISOString(),
+        billStatus: "unpaid",
+        isPosted: false,
+        totalAmount: 78000,
+        paidAmount: 39000,
+        flatDiscount: 2500,
+        dueDate: new Date(2024, 1, 12).toISOString(),
+        salesPerson: { firstname: "Noor", lastname: "Hussain" }
+      },
+      customer: {
+        _id: "cust_008",
+        customerName: "Bright Business Co",
+        customerRegion: "Islamabad"
+      }
+    },
+  ]
+};
+
 const AccountReceivables = () => {
   const [receivables, setReceivables] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,56 +193,75 @@ const AccountReceivables = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
 
-
   const totalPages = Math.ceil(receivables.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, receivables.length); // Handle last page
+  const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, receivables.length);
   const paginatedReceivables = receivables.slice(startIndex, endIndex);
-
 
   const handleConfirm = () => {
     posting()
     setIsConfirmationOpen(false);
   };
 
+  // --- Dummy Post Bill Handler (Replaces API call) ---
   const posting = async () => {
     setSuccessMessageOpen(false)
     try {
-      const response = await config.postBill(bill.billNo);
-      if (response && response.message) {
-        setSuccessMessageOpen(true)
-        fetchReceivables()
-      }
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Mark bill as posted in dummy data
+      const updatedReceivables = receivables.map(rec => {
+        if (rec.bill.billNo === bill.billNo) {
+          return {
+            ...rec,
+            bill: { ...rec.bill, isPosted: true }
+          };
+        }
+        return rec;
+      });
+
+      // Filter out posted bills
+      const unpostedReceivables = updatedReceivables.filter(rec => !rec.bill.isPosted && rec.bill.billStatus !== 'paid');
+      setReceivables(unpostedReceivables);
+      
+      // Recalculate total
+      calculateTotal(unpostedReceivables);
+      
+      setSuccessMessageOpen(true)
     } catch (error) {
       setErrorMessageOpen(true)
     }
   }
 
+  // Calculate total receivables
+  const calculateTotal = (data) => {
+    const billsWithoutPosted = data.filter(
+      (item) => item.bill.isPosted !== true
+    );
 
+    const total = billsWithoutPosted.reduce(
+      (sum, item) => sum + ((item?.bill?.totalAmount - item?.bill?.paidAmount - item?.bill?.flatDiscount) || 0),
+      0
+    );
+    setTotalReceivables(total);
+  };
+
+  // --- Dummy Data Fetcher (Replaces API call) ---
   const fetchReceivables = async () => {
     try {
-      const response = await config.getAccountReceivables();
-      // console.log('response', response)
-      if (response) {
-        const data = response.accountReceivables
-        // console.log('data', data)
-        setReceivables(data);
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-        const billsWithoutPosted = data.filter(
-          (item) => item.bill.isPosted !== true
-        );
+      const data = dummyReceivablesData.accountReceivables;
+      
+      // Filter out paid and posted bills
+      const unpostedReceivables = data.filter(rec => !rec.bill.isPosted && rec.bill.billStatus !== 'paid');
+      setReceivables(unpostedReceivables);
 
-        console.log('billsWithoutPosted', billsWithoutPosted.length)
-
-        const total = billsWithoutPosted.reduce(
-          (sum, item) => sum + ((item?.bill?.totalAmount - item?.bill?.paidAmount - item?.bill?.flatDiscount) || 0),
-          0
-        );
-        setTotalReceivables(total);
-      }
-
+      calculateTotal(unpostedReceivables);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch data');
+      setError('Failed to fetch account receivables');
     } finally {
       setLoading(false);
     }
@@ -93,14 +278,12 @@ const AccountReceivables = () => {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-
     });
   }
 
   const viewBill = (billId) => {
     navigate(`/${primaryPath}/sales/view-bill/${billId}`);
   }
-
 
   // Fetch account receivables on component mount
   useEffect(() => {
@@ -232,8 +415,7 @@ const AccountReceivables = () => {
       {totalPages > 1 && (
         <div className="flex justify-between items-center mt-4 text-sm">
           <Button
-            className={`px-4 py-2  rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-              }`}
+            className={`px-4 py-2 rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
@@ -245,8 +427,7 @@ const AccountReceivables = () => {
           </span>
 
           <Button
-            className={`px-4 py-2 rounded-md ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-              }`}
+            className={`px-4 py-2 rounded-md ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
@@ -257,7 +438,7 @@ const AccountReceivables = () => {
 
       <div className="w-full text-sm flex justify-end mt-3">
         <div className="border p-2 rounded">
-          <label className="block  mb-1">Total Outstanding Balance:</label>
+          <label className="block mb-1">Total Outstanding Balance:</label>
           <input
             type="text"
             className="border p-1 rounded w-full"

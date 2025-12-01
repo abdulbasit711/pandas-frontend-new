@@ -16,13 +16,8 @@ function LogoutBtn() {
 
   const logoutHandler = async () => {
     try {
-      const res = await authService.logout()
-  
-      if (res) {
-        setIsLoggedOut(true)
-        setResponse(res)
-      }
-      if (res && isLoggedOut !== true) {
+      
+      if (isLoggedOut !== true) {
         dispatch(logout())
         navigate('/login')
       }

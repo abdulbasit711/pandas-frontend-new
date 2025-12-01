@@ -6,17 +6,15 @@ import Barcode from 'react-barcode';
 import thermalLogo from '../../../../assets/thermalLogo.jpg'
 
 
+
 // ViewBill component wrapped in forwardRef
 const ViewBillThermal = React.forwardRef((props, ref) => {
-    const bill = props.bill;
+    const bill = props.bill // Use dummy data if no bill prop provided
     const exemptedParagraph = bill.BusinessId?.exemptedParagraph
     const packingSlip = props.packingSlip
     const previousBalance = props.previousBalance
     const showPreviousBalance = props.showPreviousBalance
     const showExemptedParagraph = props.exemptedParagraph
-    // console.log(exemptedParagraph)
-
-
 
     return bill && (
         <div className="thermal-bill mt-5 w-[80mm] min-h-[24rem] max-h-72 shadow-lg overflow-y-auto scrollbar-thin mx-auto">
@@ -118,20 +116,6 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
                     </div>
                 </div>}
 
-                {/* <div className='mt-3'>
-                    <ul className='text-[8px] text-right'>
-                        <li className='flex flex-row-reverse gap-1 pt-1'>
-                            <span>&#8592;</span> کوئی بھی آئیٹم واپس یا تبدیل ہو سکتا ہے بشرطیکہ وہ اپنی اصلی حالت میں ہو اور مکمل پیکنگ میں ہو
-                        </li>
-                        <li className='flex flex-row-reverse gap-1 pt-1'>
-                            <span>&#8592;</span> کسی بھی آئٹم کی واپسی صرف بل یا رسید کی موجودگی میں ہی قابل قبول ہوگی
-                        </li>
-                        <li className='flex flex-row-reverse gap-1 pt-1'>
-                            <span>&#8592;</span> چائنہ آئیٹمز کی واپسی نہیں ہوگی
-                        </li>
-                    </ul>
-                </div> */}
-
                 {/* Footer Section */}
                 {showExemptedParagraph &&
                     <div className="text-center mt-3 text-xs font-semibold ">
@@ -157,7 +141,6 @@ const ViewBillThermal = React.forwardRef((props, ref) => {
 
                 <div className='flex justify-center mt-2'>
                     <img src={thermalLogo} className='h-10' alt="Pandas" />
-
                 </div>
                 <div className='text-center text-[8px]'>Software by Pandas. 📞 03103480229 🌐 www.pandas.com.pk</div>
             </div>

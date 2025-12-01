@@ -21,6 +21,35 @@ function Login() {
     const [error, setError] = useState("")
 
     // console.log(authStatus);
+    const dummyUserData = {
+        _id: "674995c3134fadb3e221df43",
+        username: "abdulbasir",
+        role: "owner",
+        firstname: "Abdul",
+        lastname: "Basir",
+        email: "basir@gmail.com",
+        mobileno: [
+            "03103480229"
+        ],
+        cnic: "123456789",
+        BusinessId: {
+            _id: "6749960f134fadb3e221df4d",
+            businessName: "Pandas",
+            businessRegion: "Islamabad",
+            businessLogo: "",
+            subscription: 3,
+            gst: null,
+            isActive: true,
+
+            owner: "674995c3134fadb3e221df43",
+            createdAt: "2024-11-29T10:23:11.274Z",
+            updatedAt: "2025-06-01T05:39:13.690Z",
+            __v: 0
+        },
+        businessRole: [],
+        iat: 1767437350,
+        exp: 1768301350
+    }
 
     const login = async (data) => {
         setIsLoading(true)
@@ -28,15 +57,11 @@ function Login() {
         setError("")
         try {
 
-            const userDataRes = await authService.login(data)
-            // console.log("user data in login component: ", userDataRes.user)
-            if (userDataRes) {
-                const user = userDataRes.user
-                const resToken = userDataRes.accessToken
+            if (data.username === "abdulbasir" && data.password === "abdulbasir") {
+                const user = dummyUserData;
                 // console.log("authstatus:", authStatus, "user:", user, "token:", resToken);
                 dispatch(authLogin(user));
                 dispatch(setCurrentUser(user));
-                dispatch(setToken(resToken));
                 // console.log("authstatus:", authStatus, "user:", userData, "token:", token);
                 // console.log("username:", user.username);
                 // console.log("business:", user.BusinessId?.businessName);
