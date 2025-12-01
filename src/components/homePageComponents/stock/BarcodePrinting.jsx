@@ -25,6 +25,8 @@ const BarcodePrinting = () => {
       p.productCode.toLowerCase().includes(search.toLowerCase())
   );
 
+  const { userData } = useSelector((state) => state.auth)
+
   const handleSelectProduct = (product) => {
     setSearch('');
     setSelectedProduct([product]);
@@ -64,7 +66,7 @@ const BarcodePrinting = () => {
         <div class="label">
           <svg id="barcode-${p.productCode}"></svg>
           <div class="info">
-            <strong>Parko Electric - </strong> <strong> RS ${p.salePriceDetails[0]?.salePrice1}</strong><br />
+            <strong>${userData?.BusinessId?.businessName?.split(' ')[0]} - </strong> <strong> RS ${p.salePriceDetails[0]?.salePrice1}</strong><br />
             
           </div>
         </div>`

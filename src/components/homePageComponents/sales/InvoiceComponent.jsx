@@ -522,7 +522,7 @@ const InvoiceComponent = () => {
   };
 
   const filteredCustomers = customerData?.filter((customer) =>
-    customer.customerName.toLowerCase().includes(searchTerm.toLowerCase())
+    customer?.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const componentRef = useRef();
@@ -997,6 +997,7 @@ const InvoiceComponent = () => {
                 const customer = customerData.find((c) => c._id === customerId);
                 setCustomerFlag(customer?.customerFlag); // Added optional chaining
                 // console.log('customerFlag', customer?.customerFlag); // Added optional chaining
+                document.title = customer.customerName || 'Sale Item'
               }}
               className={`${billType === 'thermal' ? thermalColor.th100 : A4Color.a4100} border p-1 rounded text-xs w-full`}
             >
@@ -1004,15 +1005,22 @@ const InvoiceComponent = () => {
               <option value="add"
                 onClick={() => setShowAddCustomer(true)}
               >+ Add New Customer</option>
-              {filteredCustomers?.map((customer, index) => (
-                <option
-                  key={index}
-                  onClick={() => setCustomerIndex(index)}
-                  value={customer._id}
-                >
-                  {customer.customerName}
-                </option>
-              ))}
+              {filteredCustomers?.map((customer, index) => {
+                const flag =
+                  customer.customerFlag === "white" ? "⚪" :
+                    customer.customerFlag === "yellow" ? "🟡" :
+                      customer.customerFlag === "green" ? "🟢" :
+                        "🔴";
+                return (
+                  <option
+                    key={index}
+                    onClick={() => setCustomerIndex(index)}
+                    value={customer._id}
+                  >
+                    {customer.customerName} {flag}
+                  </option>
+                )
+              })}
             </select>
           </label>
 
@@ -1081,6 +1089,7 @@ const InvoiceComponent = () => {
                 totalAmount={totalAmount}
                 billType={billType}
                 billPaymentType={billPaymentType}
+                flatDiscount={flatDiscount}
               />
             </div>
           </div>

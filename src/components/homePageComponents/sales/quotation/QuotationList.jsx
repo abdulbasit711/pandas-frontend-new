@@ -9,6 +9,7 @@ import {
     clearQuotations,
 } from "../../../../utils/quotationStorage";
 import Button from "../../../Button";
+import { useSelector } from "react-redux";
 
 export default function QuotationList({ onLoadQuotation, onClose }) {
     const [quotations, setQuotations] = useState([]);
@@ -18,6 +19,7 @@ export default function QuotationList({ onLoadQuotation, onClose }) {
 
     const previewRef = useRef(); // for printing preview
     const listRef = useRef();    // optional: for printing list
+    const { userData } = useSelector((state) => state.auth)
 
     // react-to-print hook
     const handlePrintPreview = useReactToPrint({
@@ -237,10 +239,10 @@ export default function QuotationList({ onLoadQuotation, onClose }) {
                         </button>
                         <div ref={previewRef} >
                             <h4 className="text-base font-semibold mb-3">
-                                PARKO ELECTRIC AND ELECTRONICS
+                                {userData?.BusinessId?.businessName}
                             </h4>
 
-                            <div className="grid grid-cols-2 gap-3 text-[10px] mb-4">
+                            <div className="grid grid-cols-2 gap-3 text-[12px] mb-4">
                                 <div><span className="text-gray-500">ID:</span> {preview.id}</div>
                                 <div>
                                     <span className="text-gray-500">Created:</span>{" "}
@@ -264,7 +266,7 @@ export default function QuotationList({ onLoadQuotation, onClose }) {
 
                             <div className="overflow-auto max-h-72 border rounded  print:overflow-visible print:max-h-none">
                                 <table className="min-w-full text-xs">
-                                    <thead className="sticky text-[10px] top-0 bg-gray-100 border-b">
+                                    <thead className="sticky text-[12px] top-0 bg-gray-100 border-b">
                                         <tr>
                                             <th className="px-2 py-2 text-left">#</th>
                                             <th className="px-2 py-2 text-left">Product</th>
@@ -278,11 +280,11 @@ export default function QuotationList({ onLoadQuotation, onClose }) {
                                     </thead>
                                     <tbody>
                                         {(preview.payload?._rawSelectedItems ?? preview.items ?? []).map((it, idx) => (
-                                            <tr key={idx} className="border-t text-[8px]">
+                                            <tr key={idx} className="border-t text-[12px]">
                                                 <td className="px-2">{idx + 1}</td>
                                                 <td className="px-2">{it.productName ?? it.name ?? it.productCode ?? it.productId ?? "-"}</td>
                                                 <td className="px-2 text-right">{it.quantity ?? "-"}</td>
-                                                <td className="px-2 text-right">{it.billItemUnit !==0 ? it.billItemUnit : "-"}</td>
+                                                <td className="px-2 text-right">{it.billItemUnit !== 0 ? it.billItemUnit : "-"}</td>
                                                 <td className="px-2 text-right">{it.productPack ?? "-"}</td>
                                                 <td className="px-2 text-right">
                                                     {formatMoney(it.salePrice1 ?? it.price ?? 0)}
@@ -291,7 +293,7 @@ export default function QuotationList({ onLoadQuotation, onClose }) {
                                                     {formatMoney(it.discount ?? 0)}
                                                 </td>
                                                 <td className="px-2 text-right">
-                                                    {formatMoney((it.salePrice1 * (it.billItemUnit / it.productPack + it.quantity))?? 0)}
+                                                    {formatMoney((it.salePrice1 * (it.billItemUnit / it.productPack + it.quantity)) - ((it.salePrice1 * (it.billItemUnit / it.productPack + it.quantity)) * (it.discount / 100)) ?? 0)}
                                                 </td>
                                             </tr>
                                         ))}
@@ -299,13 +301,18 @@ export default function QuotationList({ onLoadQuotation, onClose }) {
                                 </table>
                             </div>
 
-                            <div className="mt-4 flex items-center justify-between text-sm">
+                            <div className="mt-4 flex justify-end text-sm">
                                 <div>
-                                    {/* <span className="text-gray-500">Flat Discount:</span>{" "}
-                                    {formatMoney(preview.payload?.flatDiscount ?? 0)} */}
-                                </div>
-                                <div className="font-semibold">
-                                    Total: {formatMoney(preview.payload?.totalAmount ?? preview.total)}
+                                    <div className="font-semibold">
+                                        Total Amount: {formatMoney(preview.payload?.totalAmount ?? preview.total)}
+                                    </div>
+                                    <div>
+                                        <span className="text-gray-500">Flat Discount:</span>{" "}
+                                        {formatMoney(preview.payload?.flatDiscount ?? 0)}
+                                    </div>
+                                    <div className="font-semibold">
+                                        Net Payable: {formatMoney(preview.payload?.totalAmount - preview.payload?.flatDiscount ?? preview.total)}
+                                    </div>
                                 </div>
                             </div>
                         </div>
