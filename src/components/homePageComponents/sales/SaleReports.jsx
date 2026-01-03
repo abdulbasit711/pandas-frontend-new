@@ -21,6 +21,29 @@ import config from '../../../features/config';
 import { useSelector } from 'react-redux';
 import SearchableDropdown from '../../../components/SearchableDropdown';
 
+/*
+  ReportsDashboard.jsx
+  -------------------------------------------------
+  A single-file React + Tailwind dashboard that contains
+  components for all requested reports and a filter bar.
+
+  Features:
+  - Report selector (productSales, salesByCategory, salesByType, etc.)
+  - Date range picker
+  - Optional product/category/type input
+  - Fetches from /api/reports (your controller) using query params
+  - Shows summary card + chart + table breakdown
+  - Uses Recharts for visualization
+
+  How to use:
+  1. Install deps: npm i react react-dom axios recharts
+  2. Ensure Tailwind CSS is set up in your project.
+  3. Place this file and import <ReportsDashboard /> into your app.
+
+  Note: The component expects the backend route you created at GET /api/reports
+  with query params: reportType, productId, categoryId, typeId, startDate, endDate
+*/
+
 const COLORS = ['#4f46e5', '#06b6d4', '#f97316', '#10b981', '#ef4444', '#8b5cf6'];
 
 // --- Dummy Data ---
